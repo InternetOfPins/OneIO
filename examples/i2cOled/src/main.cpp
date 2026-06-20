@@ -4,10 +4,19 @@ using namespace oneIO::display;
 #if defined(ARDUINO_ARCH_ESP32)
   #include <chips/esp32/esp32Device.h>
   using namespace hw::esp32;
-  using Twi   = chip::TwiMaster<21, 22>;   // SDA=GPIO21, SCL=GPIO22
+
+  // WEMOS LOLIN32 OLED: on-board SSD1306 is wired to SDA=5, SCL=4.
+  // Generic ESP32 devkit (external OLED): SDA=21, SCL=22 (Arduino default).
+  #if defined(LOLIN32_OLED)
+    using Twi = chip::TwiMaster<5, 4>;
+  #else
+    using Twi = chip::TwiMaster<21, 22>;
+  #endif
+
   using Clock = chip::SysClock;
   using Board = Esp32Dev::Board<onePin::Boot<Clock>>;
-#else
+
+#else  // AVR bare-metal
   #include <chips/avr/avrDevice.h>
   using namespace onePin;
   using namespace oneBit;
@@ -36,7 +45,11 @@ void setup() {
   Board::begin();
   Oled::begin();
   Oled::setCursor(0, 0); Oled::print("IOP SSD1306");
+#if defined(LOLIN32_OLED)
+  Oled::setCursor(0, 1); Oled::print("LOLIN32 OLED");
+#else
   Oled::setCursor(0, 1); Oled::print("I2C 0x3C");
+#endif
 
   uint32_t seconds = 0;
   Board::run([&]() {
@@ -50,7 +63,7 @@ void setup() {
 }
 void loop() {}
 
-#else
+#else  // AVR
 
 int main() {
   Board::begin();
