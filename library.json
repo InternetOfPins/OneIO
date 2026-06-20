@@ -1,0 +1,25 @@
+{
+  "name": "OneIO",
+  "version": "0.1.0",
+  "description": "IOP physical IO device drivers — displays, sensors, actuators.",
+  "keywords": ["iop", "lcd", "hd44780", "sensor", "display", "embedded", "zero-overhead"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/InternetOfPins/OneIO.git"
+  },
+  "authors": {
+    "name": "Rui Azevedo",
+    "email": "ruihfazevedo@gmail.com"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "HAPI":    "https://github.com/InternetOfPins/HAPI.git",
+    "OneBit":  "https://github.com/InternetOfPins/OneBit.git",
+    "OnePin":  "https://github.com/InternetOfPins/OnePin.git",
+    "OneChip": "https://github.com/InternetOfPins/OneChip.git",
+    "OneBus":  "https://github.com/InternetOfPins/OneBus.git"
+  },
+  "build": {
+    "includeDir": "include"
+  }
+}
