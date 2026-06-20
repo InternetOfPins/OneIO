@@ -24,11 +24,18 @@ namespace oneIO::display {
       TwiMaster::end_write();
     }
 
+    // Chunked fill — 32 bytes per I2C transaction, safe for all TwiMaster
+    // implementations including Arduino Wire (32-byte AVR / 128-byte ESP32 buffer).
     static void fill(uint8_t b, uint16_t count) {
-      TwiMaster::begin_write(Addr);
-      TwiMaster::write_byte(0x40);  // data stream
-      while (count--) TwiMaster::write_byte(b);
-      TwiMaster::end_write();
+      constexpr uint8_t CHUNK = 32;
+      while (count > 0) {
+        uint8_t n = (count > CHUNK) ? CHUNK : (uint8_t)count;
+        TwiMaster::begin_write(Addr);
+        TwiMaster::write_byte(0x40);
+        for (uint8_t i = 0; i < n; i++) TwiMaster::write_byte(b);
+        TwiMaster::end_write();
+        count -= n;
+      }
     }
   };
 
