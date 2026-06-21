@@ -68,11 +68,14 @@ namespace oneIO::display {
         _col = 0; _page = 0;
       }
 
+      // col and row are in device-native units: col = pixels (0..Width-1), row = pages (0..Height/8-1)
       static void setCursor(uint8_t col, uint8_t row) {
-        _col  = col * 6;
+        _col  = col;
         _page = row;
         _set_pos(_col, _page);
       }
+      static constexpr uint8_t charWidth()  { return 6; }  // font5x8: 5px glyph + 1px gap
+      static constexpr uint8_t lineHeight() { return 1; }  // 1 page = 8px per text row
 
       static void print(char c) {
         if (c == '\n') {
