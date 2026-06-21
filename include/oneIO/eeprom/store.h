@@ -187,10 +187,6 @@ namespace oneIO::eeprom {
   // ── EepromBlock<Eeprom, Data, AssignedSize, PageSize, BaseAddr, Magic, Version>
   // Convenience alias: wires Signature + Crc32 + BlockRecycle together.
   // BlockRecycle derives blockSize and blockCount from the sizing parameters.
-  //
-  // Example — 256 bytes of AT24C32, page 32, two config stores side-by-side:
-  //   using CfgStore  = EepromBlock<Eep, Config,  128, 32, 0>;    // 0x000..0x07F
-  //   using CalStore  = EepromBlock<Eep, CalData, 128, 32, 128>;  // 0x080..0x0FF
   template<typename Eeprom,
            typename Data,
            uint16_t AssignedSize,
@@ -205,5 +201,34 @@ namespace oneIO::eeprom {
     BlockRecycle<Signature<Magic,Version>::size + sizeof(Data) + Crc32::size,
                  AssignedSize, PageSize>,
     BaseAddr>;
+
+  // ── EepromRoot<ChipBase> ──────────────────────────────────────────────────
+  // Chain terminal that seeds eepromBase for component-level address allocation.
+  //
+  // Components read O::eepromBase for their EepromBlock BaseAddr, then expose
+  // eepromBase = O::eepromBase + AssignedSize so the next outer component picks
+  // up where this one ends.  The chain computes the full address map at compile
+  // time with no manual offset arithmetic.
+  //
+  // Usage pattern inside a component's Part<O>:
+  //
+  //   template<typename O>
+  //   struct Part : O {
+  //     using Store = EepromBlock<Eep, MyData, 128, 32, O::eepromBase>;
+  //     static constexpr uint16_t eepromBase = O::eepromBase + 128;
+  //     // ... component methods using Store::load() / Store::save() ...
+  //   };
+  //
+  // Composing (innermost component first, outermost last):
+  //
+  //   using MyDev = hapi::APIOf<EepromRoot<>, SharedComp, SpecificComp>;
+  //   // SharedComp  at 0x000 + its AssignedSize
+  //   // SpecificComp at SharedComp::eepromBase + its AssignedSize
+  //
+  // ChipBase offsets the whole allocation within the chip (default 0).
+  template<uint16_t ChipBase = 0>
+  struct EepromRoot {
+    static constexpr uint16_t eepromBase = ChipBase;
+  };
 
 } // oneIO::eeprom
