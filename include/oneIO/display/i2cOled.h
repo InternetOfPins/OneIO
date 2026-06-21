@@ -14,10 +14,14 @@ namespace oneIO::display {
   // the sda/scl args are silently ignored if the platform Wire doesn't support them.
   template<TwoWire& wire, int sda = -1, int scl = -1>
   struct ArduinoWire {
-    static void begin()                    { _begin(wire); }
-    static void begin_write(uint8_t addr)  { wire.beginTransmission(addr); }
-    static void write_byte(uint8_t b)      { wire.write(b); }
-    static void end_write()                { wire.endTransmission(); }
+    static void    begin()                       { _begin(wire); }
+    static void    begin_write(uint8_t addr)     { wire.beginTransmission(addr); }
+    static void    write_byte(uint8_t b)         { wire.write(b); }
+    static void    end_write()                   { wire.endTransmission(); }
+    static uint8_t request_from(uint8_t addr, uint8_t n) {
+      return (uint8_t)wire.requestFrom(addr, (uint8_t)n);
+    }
+    static uint8_t read_byte()                   { return (uint8_t)wire.read(); }
   private:
     // Detect Wire::begin(int,int) — exists on ESP32/RP2040, not on AVR.
     template<typename W, typename = void>
