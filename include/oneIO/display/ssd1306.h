@@ -26,11 +26,14 @@ namespace oneIO::display {
       using Base = O;
       using Base::Base;
 
-      inline static uint8_t _col  = 0;   // pixel column 0–(Width-1)
-      inline static uint8_t _page = 0;   // page 0–(Height/8-1)
-      inline static uint8_t  _inv  = 0x00; // 0x00=normal, 0xFF=inverted — XOR mask per your SSD1306Ascii PR
+      inline static uint8_t _col  = 0;
+      inline static uint8_t _page = 0;
+      inline static uint8_t _inv  = 0x00; // 0x00=normal, 0xFF=inverted XOR mask
 
     public:
+      static constexpr uint8_t kWidth  = Width;
+      static constexpr uint8_t kHeight = Height;
+
       static void setInverted(bool v) { _inv = v ? 0xFF : 0x00; }
 
     private:
