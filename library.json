@@ -1,6 +1,6 @@
 {
   "name": "OneIO",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "IOP physical IO device drivers — displays, sensors, actuators.",
   "keywords": ["iop", "lcd", "hd44780", "sensor", "display", "embedded", "zero-overhead"],
   "repository": {
