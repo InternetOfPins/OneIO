@@ -1,7 +1,22 @@
 #pragma once
 #include <oneIO/display/ssd1306.h>
+#ifdef ARDUINO
+#include <Wire.h>
+#endif
 
 namespace oneIO::display {
+
+#ifdef ARDUINO
+  // TwiMaster adapter for Arduino Wire library.
+  // ArduinoWire<Wire, sda, scl> on ESP32; ArduinoWire<Wire> on AVR (default pins).
+  template<TwoWire& wire, int sda = -1, int scl = -1>
+  struct ArduinoWire {
+    static void begin()                    { if constexpr(sda >= 0) wire.begin(sda, scl); else wire.begin(); }
+    static void begin_write(uint8_t addr)  { wire.beginTransmission(addr); }
+    static void write_byte(uint8_t b)      { wire.write(b); }
+    static void end_write()                { wire.endTransmission(); }
+  };
+#endif
 
   // I2C transport for SSD1306.
   // TwiMaster must provide begin_write(addr)/write_byte(b)/end_write().
@@ -48,5 +63,16 @@ namespace oneIO::display {
 
   template<typename TwiMaster, uint8_t Addr = 0x3C>
   using I2cOled32 = I2cOled<TwiMaster, Addr, 128, 32>;
+
+#ifdef ARDUINO
+  // Convenience aliases for the common Arduino Wire case.
+  // I2cOledWire<Wire, sda, scl> — single include, no separate ArduinoWire<> typedef needed.
+  template<TwoWire& wire, int sda = -1, int scl = -1,
+           uint8_t Addr = 0x3C, uint8_t Width = 128, uint8_t Height = 64>
+  using I2cOledWire = I2cOled<ArduinoWire<wire, sda, scl>, Addr, Width, Height>;
+
+  template<TwoWire& wire, int sda = -1, int scl = -1, uint8_t Addr = 0x3C>
+  using I2cOledWire32 = I2cOledWire<wire, sda, scl, Addr, 128, 32>;
+#endif
 
 } // oneIO::display
