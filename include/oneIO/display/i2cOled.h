@@ -8,13 +8,32 @@ namespace oneIO::display {
 
 #ifdef ARDUINO
   // TwiMaster adapter for Arduino Wire library.
-  // ArduinoWire<Wire, sda, scl> on ESP32; ArduinoWire<Wire> on AVR (default pins).
+  // ArduinoWire<Wire, sda, scl> on ESP32/RP2040 (pin-configurable Wire::begin);
+  // ArduinoWire<Wire> on AVR (default pins, no pin-config overload).
+  // begin() auto-detects which Wire::begin overload to call via SFINAE —
+  // the sda/scl args are silently ignored if the platform Wire doesn't support them.
   template<TwoWire& wire, int sda = -1, int scl = -1>
   struct ArduinoWire {
-    static void begin()                    { if constexpr(sda >= 0) wire.begin(sda, scl); else wire.begin(); }
+    static void begin()                    { _begin(wire); }
     static void begin_write(uint8_t addr)  { wire.beginTransmission(addr); }
     static void write_byte(uint8_t b)      { wire.write(b); }
     static void end_write()                { wire.endTransmission(); }
+  private:
+    // Detect Wire::begin(int,int) — exists on ESP32/RP2040, not on AVR.
+    template<typename W, typename = void>
+    struct _HasPinBegin : std::false_type {};
+    template<typename W>
+    struct _HasPinBegin<W, std::void_t<decltype(std::declval<W&>().begin(0, 0))>>
+      : std::true_type {};
+
+    // W is a dependent type so if constexpr can gate the call correctly.
+    template<typename W>
+    static void _begin(W& w) {
+      if constexpr(sda >= 0 && _HasPinBegin<W>::value)
+        w.begin(sda, scl);
+      else
+        w.begin();
+    }
   };
 #endif
 
