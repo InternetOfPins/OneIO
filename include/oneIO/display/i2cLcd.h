@@ -23,8 +23,8 @@ namespace oneIO::display {
     // P3 (BL) = 1 always — backlight on, never touched by Hd44780
   };
 
-  template<typename TwiMaster, uint8_t Addr = 0x27>
-  using I2cLcd = hapi::APIOf<LcdDef,
+  template<typename TwiMaster, uint8_t Addr = 0x27, uint8_t Cols = 16, uint8_t Rows = 2>
+  struct I2cLcd : hapi::APIOf<LcdDef,
     Hd44780<
       typename I2cLcdPins<TwiMaster, Addr>::RS,
       typename I2cLcdPins<TwiMaster, Addr>::EN,
@@ -32,6 +32,9 @@ namespace oneIO::display {
       typename I2cLcdPins<TwiMaster, Addr>::D5,
       typename I2cLcdPins<TwiMaster, Addr>::D6,
       typename I2cLcdPins<TwiMaster, Addr>::D7
-    >>;
+    >> {
+    static constexpr uint8_t cols = Cols;
+    static constexpr uint8_t rows = Rows;
+  };
 
 } // oneIO::display
