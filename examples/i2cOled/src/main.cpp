@@ -1,7 +1,17 @@
 #include <oneIO/display/i2cOled.h>
 using namespace oneIO::display;
 
-#if defined(ARDUINO_ARCH_ESP32)
+#if defined(ARDUINO_ARCH_ESP8266)
+  #include <chips/esp8266/esp8266Device.h>
+  using namespace hw::esp8266;
+  using Twi  = chip::TwiMaster<4, 5, 400000>;  // SDA=GPIO4(D2), SCL=GPIO5(D1)
+  using Clock = chip::SysClock;
+  struct Board {
+    static void begin() {}
+    template<typename Fn> static void run(Fn fn) { while (true) fn(); }
+  };
+
+#elif defined(ARDUINO_ARCH_ESP32)
   #include <chips/esp32/esp32Device.h>
   using namespace hw::esp32;
 
