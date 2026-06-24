@@ -1,48 +1,15 @@
 #pragma once
 #include <oneIO/display/ssd1306.h>
-#ifdef ARDUINO
-#include <Wire.h>
-#endif
+#include <oneIO/display/arduinoWire.h>  // ArduinoWire<wire, sda, scl> — inside #ifdef ARDUINO
+#include <oneBus/twiMaster.h>
 
 namespace oneIO::display {
-
-#ifdef ARDUINO
-  // TwiMaster adapter for Arduino Wire library.
-  // ArduinoWire<Wire, sda, scl> on ESP32/RP2040 (pin-configurable Wire::begin);
-  // ArduinoWire<Wire> on AVR (default pins, no pin-config overload).
-  /// @brief Arduino Wire I2C adapter; auto-detects begin(sda,scl) vs begin() via SFINAE
-  template<TwoWire& wire, int sda = -1, int scl = -1>
-  struct ArduinoWire {
-    static void    begin()                       { _begin(wire); }
-    static void    begin_write(uint8_t addr)     { wire.beginTransmission(addr); }
-    static void    write_byte(uint8_t b)         { wire.write(b); }
-    static void    end_write()                   { wire.endTransmission(); }
-    static uint8_t request_from(uint8_t addr, uint8_t n) {
-      return (uint8_t)wire.requestFrom(addr, (uint8_t)n);
-    }
-    static uint8_t read_byte()                   { return (uint8_t)wire.read(); }
-  private:
-    // Detect Wire::begin(int,int) — exists on ESP32/RP2040, not on AVR.
-    template<typename W, typename = void>
-    struct _HasPinBegin : std::false_type {};
-    template<typename W>
-    struct _HasPinBegin<W, std::void_t<decltype(std::declval<W&>().begin(0, 0))>>
-      : std::true_type {};
-
-    // W is a dependent type so if constexpr can gate the call correctly.
-    template<typename W>
-    static void _begin(W& w) {
-      if constexpr(sda >= 0 && _HasPinBegin<W>::value)
-        w.begin(sda, scl);
-      else
-        w.begin();
-    }
-  };
-#endif
 
   /// @brief I2C transport for SSD1306; Addr 0x3C (default) or 0x3D depending on SA0 pin
   template<typename TwiMaster, uint8_t Addr = 0x3C>
   struct I2cSsd1306Transport {
+    static_assert(oneBus::is_twi_master<TwiMaster>::value,
+      "TwiMaster must satisfy oneBus::is_twi_master — see <oneBus/twiMaster.h>");
     static void begin() { TwiMaster::begin(); }
 
     static void cmd(uint8_t c) {

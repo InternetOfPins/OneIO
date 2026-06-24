@@ -1,3 +1,9 @@
+// Compatibility shim — ArduinoWire<> now lives in oneBus::ArduinoWire<>.
+// Include <oneBus/arduinoI2C.h> directly in new code.
 #pragma once
-// ArduinoWire is now defined in i2cOled.h — include that instead.
-#include <oneIO/display/i2cOled.h>
+#include <oneBus/arduinoI2C.h>
+#ifdef ARDUINO
+namespace oneIO::display {
+  using oneBus::ArduinoWire;
+} // oneIO::display
+#endif

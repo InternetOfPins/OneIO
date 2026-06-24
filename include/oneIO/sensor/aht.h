@@ -1,6 +1,7 @@
 #pragma once
 #include <hapi/hapi.h>
 #include <oneChip/clock.h>
+#include <oneBus/twiMaster.h>
 #include <stdint.h>
 
 namespace oneIO::sensor {
@@ -34,6 +35,8 @@ namespace oneIO::sensor {
            uint8_t InitCmd = 0xBE,  // 0xE1 for AHT10, 0xBE for AHT20/AHT30
            uint8_t Addr    = detail::AHT_ADDR>
   struct AHT {
+    static_assert(oneBus::is_twi_master<TwiMaster>::value,
+      "TwiMaster must satisfy oneBus::is_twi_master — see OneBus/twiMaster.h");
     struct SensorDef { SensorDef() = delete; };
 
     template<typename O>
@@ -115,21 +118,21 @@ namespace oneIO::sensor {
 } // oneIO::sensor
 
 #ifdef ARDUINO
-#include <oneIO/display/arduinoWire.h>
+#include <oneBus/arduinoI2C.h>
 namespace oneIO::sensor {
 
   // Convenience aliases
   template<TwoWire& wire, uint8_t InitCmd = 0xBE, int sda = -1, int scl = -1>
-  struct AHTWire : AHT<oneIO::display::ArduinoWire<wire, sda, scl>, InitCmd> {};
+  struct AHTWire : AHT<oneBus::ArduinoWire<wire, sda, scl>, InitCmd> {};
 
   template<TwoWire& wire, int sda = -1, int scl = -1>
-  struct AHT10Wire : AHT<oneIO::display::ArduinoWire<wire, sda, scl>, 0xE1> {};
+  struct AHT10Wire : AHT<oneBus::ArduinoWire<wire, sda, scl>, 0xE1> {};
 
   template<TwoWire& wire, int sda = -1, int scl = -1>
-  struct AHT20Wire : AHT<oneIO::display::ArduinoWire<wire, sda, scl>, 0xBE> {};
+  struct AHT20Wire : AHT<oneBus::ArduinoWire<wire, sda, scl>, 0xBE> {};
 
   template<TwoWire& wire, int sda = -1, int scl = -1>
-  struct AHT30Wire : AHT<oneIO::display::ArduinoWire<wire, sda, scl>, 0xBE> {};
+  struct AHT30Wire : AHT<oneBus::ArduinoWire<wire, sda, scl>, 0xBE> {};
 
 } // oneIO::sensor
 #endif

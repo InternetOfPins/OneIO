@@ -1,6 +1,7 @@
 #pragma once
 #include <hapi/hapi.h>
 #include <oneChip/clock.h>
+#include <oneBus/twiMaster.h>
 #include <stdint.h>
 
 namespace oneIO::eeprom {
@@ -14,6 +15,8 @@ namespace oneIO::eeprom {
   /// @brief AT24Cxx I2C EEPROM driver; raw byte read/write with page-write and 32-byte chunk reads
   template<typename TwiMaster, uint8_t Addr = 0x50, uint8_t PageSize = 32>
   struct AT24C {
+    static_assert(oneBus::is_twi_master<TwiMaster>::value,
+      "TwiMaster must satisfy oneBus::is_twi_master — see <oneBus/twiMaster.h>");
     static void begin() { TwiMaster::begin(); }
 
     // Sequential read — chunked to 32 bytes per request (AVR Wire buffer limit)
@@ -51,12 +54,12 @@ namespace oneIO::eeprom {
 } // oneIO::eeprom
 
 #ifdef ARDUINO
-#include <oneIO/display/i2cOled.h>   // ArduinoWire<wire, sda, scl>
+#include <oneBus/arduinoI2C.h>
 namespace oneIO::eeprom {
 
   template<TwoWire& wire, int sda = -1, int scl = -1,
            uint8_t Addr = 0x50, uint8_t PageSize = 32>
-  using AT24CWire = AT24C<oneIO::display::ArduinoWire<wire, sda, scl>, Addr, PageSize>;
+  using AT24CWire = AT24C<oneBus::ArduinoWire<wire, sda, scl>, Addr, PageSize>;
 
 } // oneIO::eeprom
 #endif

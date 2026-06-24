@@ -1,5 +1,6 @@
 #pragma once
 #include <hapi/hapi.h>
+#include <oneBus/twiMaster.h>
 #include <stdint.h>
 
 namespace oneIO::rtc {
@@ -25,6 +26,8 @@ namespace oneIO::rtc {
   /// @brief DS3231 I2C RTC + temperature sensor; now() reads DateTime, set() writes, tempC() in °C
   template<typename TwiMaster, uint8_t Addr = 0x68>
   struct Ds3231 {
+    static_assert(oneBus::is_twi_master<TwiMaster>::value,
+      "TwiMaster must satisfy oneBus::is_twi_master — see <oneBus/twiMaster.h>");
     template<typename O>
     struct Part : O {
       using Base = O;

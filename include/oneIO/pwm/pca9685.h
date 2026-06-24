@@ -1,6 +1,7 @@
 #pragma once
 #include <hapi/hapi.h>
 #include <oneChip/clock.h>
+#include <oneBus/twiMaster.h>
 #include <stdint.h>
 
 namespace oneIO::pwm {
@@ -36,6 +37,8 @@ namespace oneIO::pwm {
   /// @brief PCA9685 16-channel 12-bit PWM controller (I2C); setChannel(n, on, off) for duty cycle
   template<typename TwiMaster, uint8_t Addr = 0x40>
   struct PCA9685 {
+    static_assert(oneBus::is_twi_master<TwiMaster>::value,
+      "TwiMaster must satisfy oneBus::is_twi_master — see <oneBus/twiMaster.h>");
     struct PwmDef { PwmDef() = delete; };
 
     template<typename O>
@@ -128,11 +131,11 @@ namespace oneIO::pwm {
 } // oneIO::pwm
 
 #ifdef ARDUINO
-#include <oneIO/display/arduinoWire.h>
+#include <oneBus/arduinoI2C.h>
 namespace oneIO::pwm {
 
   template<TwoWire& wire, uint8_t Addr = 0x40, int sda = -1, int scl = -1>
-  struct PCA9685Wire : PCA9685<oneIO::display::ArduinoWire<wire, sda, scl>, Addr> {};
+  struct PCA9685Wire : PCA9685<oneBus::ArduinoWire<wire, sda, scl>, Addr> {};
 
 } // oneIO::pwm
 #endif
