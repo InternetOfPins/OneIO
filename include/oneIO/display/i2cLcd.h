@@ -4,34 +4,27 @@
 
 namespace oneIO::display {
 
-  // PCF8574 I2C LCD backpack — standard pin mapping:
-  //   P0=RS  P1=RW  P2=EN  P3=BL  P4=D4  P5=D5  P6=D6  P7=D7
-  //
-  // InitShadow=0x08: backlight ON (P3=1), RW=0 (write mode), rest low.
-  // TwiMaster: hw::avr::AvrTwiMaster<> or equivalent.
+  // HD44780 character LCD over PCF8574 I2C backpack.
+  // Pin numbers are PCF8574 virtual pins (P0–P7).
+  // Defaults match the most common backpack wiring:
+  //   P0=RS  P1=RW(gnd)  P2=EN  P3=BL(vcc)  P4=D4  P5=D5  P6=D6  P7=D7
+  // BL=InitShadow bit: 1<<BL keeps backlight on without a dedicated control pin.
   // Addr: 0x27 (PCF8574) or 0x3F (PCF8574A).
-  template<typename TwiMaster, uint8_t Addr = 0x27>
-  struct I2cLcdPins {
-    using Port = oneBus::I2cGpio<TwiMaster, Addr, 0x08>;
-    using RS   = typename Port::template Pin<0>;
-    using EN   = typename Port::template Pin<2>;
-    using D4   = typename Port::template Pin<4>;
-    using D5   = typename Port::template Pin<5>;
-    using D6   = typename Port::template Pin<6>;
-    using D7   = typename Port::template Pin<7>;
-    // P1 (RW) = 0 always — write mode, never touched by Hd44780
-    // P3 (BL) = 1 always — backlight on, never touched by Hd44780
-  };
-
-  template<typename TwiMaster, uint8_t Addr = 0x27, uint8_t Cols = 16, uint8_t Rows = 2>
+  template<typename TwiMaster,
+           uint8_t Addr = 0x27,
+           uint8_t Cols = 16, uint8_t Rows = 2,
+           uint8_t RS   = 0,
+           uint8_t EN   = 2,
+           uint8_t D4   = 4, uint8_t D5 = 5, uint8_t D6 = 6, uint8_t D7 = 7,
+           uint8_t BL   = 3>
   struct I2cLcd : hapi::APIOf<LcdDef,
     Hd44780<
-      typename I2cLcdPins<TwiMaster, Addr>::RS,
-      typename I2cLcdPins<TwiMaster, Addr>::EN,
-      typename I2cLcdPins<TwiMaster, Addr>::D4,
-      typename I2cLcdPins<TwiMaster, Addr>::D5,
-      typename I2cLcdPins<TwiMaster, Addr>::D6,
-      typename I2cLcdPins<TwiMaster, Addr>::D7
+      typename oneBus::I2cGpio<TwiMaster, Addr, (1<<BL)>::template Pin<RS>,
+      typename oneBus::I2cGpio<TwiMaster, Addr, (1<<BL)>::template Pin<EN>,
+      typename oneBus::I2cGpio<TwiMaster, Addr, (1<<BL)>::template Pin<D4>,
+      typename oneBus::I2cGpio<TwiMaster, Addr, (1<<BL)>::template Pin<D5>,
+      typename oneBus::I2cGpio<TwiMaster, Addr, (1<<BL)>::template Pin<D6>,
+      typename oneBus::I2cGpio<TwiMaster, Addr, (1<<BL)>::template Pin<D7>
     >> {
     static constexpr uint8_t cols = Cols;
     static constexpr uint8_t rows = Rows;
