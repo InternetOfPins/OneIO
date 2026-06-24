@@ -56,7 +56,7 @@ namespace oneIO::display {
   // I2cOledWire<Wire, sda, scl> — single include, no separate ArduinoWire<> typedef needed.
   template<TwoWire& wire, int sda = -1, int scl = -1,
            uint8_t Addr = 0x3C, uint8_t Width = 128, uint8_t Height = 64>
-  using I2cOledWire = I2cOled<ArduinoWire<wire, sda, scl>, Addr, Width, Height>;
+  using I2cOledWire = I2cOled<oneBus::ArduinoWire<wire, sda, scl>, Addr, Width, Height>;
 
   template<TwoWire& wire, int sda = -1, int scl = -1, uint8_t Addr = 0x3C>
   using I2cOledWire32 = I2cOledWire<wire, sda, scl, Addr, 128, 32>;
