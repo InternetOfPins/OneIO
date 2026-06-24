@@ -6,6 +6,7 @@
 
 #pragma once
 #include <hapi/hapi.h>
+#include <tinyTimeUtils.h>
 #include <stdint.h>
 
 namespace oneIO::sensor {
@@ -54,11 +55,7 @@ namespace oneIO::sensor {
 
       static Reading sample() {
         if (!trigger()) return { 0, false };
-#ifdef ARDUINO
-        ::delay(750);
-#else
-        for (volatile uint32_t i = 0; i < 750000UL; ++i);
-#endif
+        TinyTimeUtils::ms_delay(750);
         return read();
       }
     };
