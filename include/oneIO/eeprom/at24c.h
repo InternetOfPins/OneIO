@@ -13,6 +13,7 @@ namespace oneIO::eeprom {
   //   request_from(addr, n), read_byte()
   // Addr:     0x50..0x57 (A0-A2 pins)
   // PageSize: 32 bytes (AT24C32/64/128/256) or 8 (AT24C01/02/04/08/16)
+  /// @brief AT24Cxx I2C EEPROM driver; raw byte read/write with page-write and 32-byte chunk reads
   template<typename TwiMaster, uint8_t Addr = 0x50, uint8_t PageSize = 32>
   struct AT24C {
     static void begin() { TwiMaster::begin(); }

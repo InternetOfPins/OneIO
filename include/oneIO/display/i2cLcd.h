@@ -10,6 +10,7 @@ namespace oneIO::display {
   //   P0=RS  P1=RW(gnd)  P2=EN  P3=BL(vcc)  P4=D4  P5=D5  P6=D6  P7=D7
   // BL=InitShadow bit: 1<<BL keeps backlight on without a dedicated control pin.
   // Addr: 0x27 (PCF8574) or 0x3F (PCF8574A).
+  /// @brief HD44780 LCD over PCF8574 I2C backpack; pin numbers P0-P7 default to standard backpack wiring
   template<typename TwiMaster,
            uint8_t Addr = 0x27,
            uint8_t Cols = 16, uint8_t Rows = 2,

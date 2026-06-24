@@ -23,6 +23,7 @@ namespace oneIO::storage {
   // CsPin: SPI chip-select pin for the SD module.
   // Filename: 8.3 format (FAT16/FAT32 constraint on most SD libs).
 
+  /// @brief Arduino SD library wrapper; read/write at flat byte offsets — compatible with EepromStore<> backing
   template<uint8_t CsPin, const char* Filename>
   struct SDCard {
     struct StoreDef { StoreDef() = delete; };
@@ -76,6 +77,7 @@ namespace oneIO::storage {
 
   // SdRoot<BaseAddr> — HAPI chain terminal for SD address allocation.
   // Same contract as EepromRoot<> but for SD file offsets.
+  /// @brief HAPI chain terminal for SD file offset allocation; same contract as EepromRoot<>
   template<uint32_t BaseAddr = 0>
   struct SdRoot {
     static constexpr uint32_t sdBase = BaseAddr;

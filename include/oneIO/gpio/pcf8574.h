@@ -19,6 +19,7 @@ namespace oneIO::gpio {
   //   PCF8574A / PCF8574AT:         0x38..0x3F
   //
   // TwiMaster: ArduinoWire<wire> or compatible.
+  /// @brief PCF8574 I2C 8-bit GPIO expander; open-drain quasi-bidirectional; write 1 to read a pin
   template<typename TwiMaster, uint8_t Addr = 0x27>
   struct PCF8574 {
     struct GpioDef { GpioDef() = delete; };

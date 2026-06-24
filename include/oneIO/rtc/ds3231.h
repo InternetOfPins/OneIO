@@ -4,6 +4,7 @@
 
 namespace oneIO::rtc {
 
+  /// @brief RTC date/time value: year/month/day/hour/min/sec + dow (1=Sun..7=Sat)
   struct DateTime {
     uint16_t year;
     uint8_t  month, day;
@@ -21,6 +22,7 @@ namespace oneIO::rtc {
   //   begin(), begin_write(addr), write_byte(b), end_write(),
   //   request_from(addr, n), read_byte()
   // Compatible with oneIO::display::ArduinoWire<wire> (extended with read ops).
+  /// @brief DS3231 I2C RTC + temperature sensor; now() reads DateTime, set() writes, tempC() in °C
   template<typename TwiMaster, uint8_t Addr = 0x68>
   struct Ds3231 {
     template<typename O>
