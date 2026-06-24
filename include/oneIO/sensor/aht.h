@@ -1,8 +1,7 @@
 #pragma once
 #include <hapi/hapi.h>
+#include <tinyTimeUtils.h>
 #include <stdint.h>
-#ifdef ARDUINO
-#include <oneIO/display/arduinoWire.h>
 
 namespace oneIO::sensor {
 
@@ -46,16 +45,16 @@ namespace oneIO::sensor {
       static void begin() {
         TwiMaster::begin();
         _reset();
-        delay(20);
+        TinyTimeUtils::ms_delay(20);
         _init();
-        delay(10);
+        TinyTimeUtils::ms_delay(10);
         O::begin();
       }
 
       // Trigger a measurement and block until data ready (~80ms).
       static bool measure() {
         _trigger();
-        delay(80);
+        TinyTimeUtils::ms_delay(80);
         return _read();
       }
 
@@ -112,6 +111,12 @@ namespace oneIO::sensor {
 
     using Api = hapi::APIOf<SensorDef, AHT<TwiMaster, InitCmd, Addr>>;
   };
+
+} // oneIO::sensor
+
+#ifdef ARDUINO
+#include <oneIO/display/arduinoWire.h>
+namespace oneIO::sensor {
 
   // Convenience aliases
   template<TwoWire& wire, uint8_t InitCmd = 0xBE, int sda = -1, int scl = -1>

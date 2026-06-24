@@ -1,8 +1,7 @@
 #pragma once
 #include <hapi/hapi.h>
+#include <tinyTimeUtils.h>
 #include <stdint.h>
-#ifdef ARDUINO
-#include <oneIO/display/arduinoWire.h>
 
 namespace oneIO::pwm {
 
@@ -44,7 +43,7 @@ namespace oneIO::pwm {
       static void begin(uint16_t freq_hz = 1000) {
         TwiMaster::begin();
         _write_reg(detail::PCA_MODE1, detail::PCA_ALLCALL);
-        delay(1);
+        TinyTimeUtils::ms_delay(1);
         _write_reg(detail::PCA_MODE2, detail::PCA_OUTDRV);
         set_freq(freq_hz);
         O::begin();
@@ -62,7 +61,7 @@ namespace oneIO::pwm {
         _write_reg(detail::PCA_MODE1, (old & 0x7F) | detail::PCA_SLEEP);
         _write_reg(detail::PCA_PRESCALE, uint8_t(prescale));
         _write_reg(detail::PCA_MODE1, old);
-        delay(1);
+        TinyTimeUtils::ms_delay(1);
         _write_reg(detail::PCA_MODE1, old | detail::PCA_AI);
       }
 
@@ -125,6 +124,12 @@ namespace oneIO::pwm {
 
     using Api = hapi::APIOf<PwmDef, PCA9685<TwiMaster, Addr>>;
   };
+
+} // oneIO::pwm
+
+#ifdef ARDUINO
+#include <oneIO/display/arduinoWire.h>
+namespace oneIO::pwm {
 
   template<TwoWire& wire, uint8_t Addr = 0x40, int sda = -1, int scl = -1>
   struct PCA9685Wire : PCA9685<oneIO::display::ArduinoWire<wire, sda, scl>, Addr> {};

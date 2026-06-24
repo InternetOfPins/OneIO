@@ -13,11 +13,12 @@
   },
   "license": "MIT",
   "dependencies": {
-    "HAPI":    "https://github.com/InternetOfPins/HAPI.git",
-    "OneBit":  "https://github.com/InternetOfPins/OneBit.git",
-    "OnePin":  "https://github.com/InternetOfPins/OnePin.git",
-    "OneChip": "https://github.com/InternetOfPins/OneChip.git",
-    "OneBus":  "https://github.com/InternetOfPins/OneBus.git"
+    "HAPI":          "https://github.com/InternetOfPins/HAPI.git",
+    "OneBit":        "https://github.com/InternetOfPins/OneBit.git",
+    "OnePin":        "https://github.com/InternetOfPins/OnePin.git",
+    "OneChip":       "https://github.com/InternetOfPins/OneChip.git",
+    "OneBus":        "https://github.com/InternetOfPins/OneBus.git",
+    "tinyTimeUtils": "https://github.com/neu-rah/tinyTimeUtils.git"
   },
   "build": {
     "includeDir": "include"

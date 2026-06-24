@@ -1,9 +1,7 @@
 #pragma once
 #include <hapi/hapi.h>
+#include <tinyTimeUtils.h>
 #include <stdint.h>
-#ifdef ARDUINO
-#include <Arduino.h>
-#include <oneIO/display/i2cOled.h>   // ArduinoWire<wire, sda, scl>
 
 namespace oneIO::eeprom {
 
@@ -44,13 +42,18 @@ namespace oneIO::eeprom {
         TwiMaster::write_byte(uint8_t(addr));
         for (uint8_t i = 0; i < n; i++) TwiMaster::write_byte(*buf++);
         TwiMaster::end_write();
-        delay(5);
+        TinyTimeUtils::ms_delay(5);
         addr += n; len -= n;
       }
     }
   };
 
-  // Convenience alias for Arduino Wire
+} // oneIO::eeprom
+
+#ifdef ARDUINO
+#include <oneIO/display/i2cOled.h>   // ArduinoWire<wire, sda, scl>
+namespace oneIO::eeprom {
+
   template<TwoWire& wire, int sda = -1, int scl = -1,
            uint8_t Addr = 0x50, uint8_t PageSize = 32>
   using AT24CWire = AT24C<oneIO::display::ArduinoWire<wire, sda, scl>, Addr, PageSize>;

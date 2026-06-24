@@ -1,5 +1,6 @@
 #pragma once
 #include <hapi/hapi.h>
+#include <tinyTimeUtils.h>
 #include <stdint.h>
 #include <oneIO/display/font5x8.h>
 #include <oneIO/display/spiTft.h>
@@ -8,14 +9,7 @@ namespace oneIO::display {
 
   namespace st7735_detail {
 #ifndef ST7735_DELAY_MS
-#  ifdef ARDUINO
-#    define ST7735_DELAY_MS(ms) ::delay(ms)
-#  else
-    inline void delay_ms(uint32_t ms) {
-      for (volatile uint32_t i = 0; i < ms * 1000UL; ++i);
-    }
-#    define ST7735_DELAY_MS(ms) oneIO::display::st7735_detail::delay_ms(ms)
-#  endif
+#  define ST7735_DELAY_MS(ms) TinyTimeUtils::ms_delay(ms)
 #endif
   }
 
