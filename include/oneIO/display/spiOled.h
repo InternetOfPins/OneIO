@@ -5,8 +5,7 @@ namespace oneIO::display {
 
   // SPI transport for SSD1306.
   // SpiMaster: must provide begin(), fill(b, count), transfer(buf, len).
-  // CsPin, DcPin: IOP-style static pin types (on/off/begin).
-  // RstPin: optional reset pin. Pass void to skip reset.
+  /// @brief SPI transport for SSD1306; RstPin=void to skip reset
   template<typename SpiMaster, typename CsPin, typename DcPin,
            typename RstPin = void>
   struct SpiSsd1306Transport {

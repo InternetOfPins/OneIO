@@ -30,6 +30,7 @@ namespace oneIO::sensor {
     static constexpr uint8_t AHT_STATUS_CAL  = (1<<3);
   }
 
+  /// @brief AHT10/20/30 temperature+humidity sensor driver; read() returns {temp_c, rh_pct}
   template<typename TwiMaster,
            uint8_t InitCmd = 0xBE,  // 0xE1 for AHT10, 0xBE for AHT20/AHT30
            uint8_t Addr    = detail::AHT_ADDR>

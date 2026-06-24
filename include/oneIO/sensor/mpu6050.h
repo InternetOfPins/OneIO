@@ -9,6 +9,7 @@
 
 namespace oneSensor {
 
+  /// @brief InvenSense MPU-6050 6-axis IMU (I2C); readAccel/readGyro return raw 16-bit values
   template<typename Bus, uint8_t Addr = 0x68>
   struct MPU6050 {
     struct Part {

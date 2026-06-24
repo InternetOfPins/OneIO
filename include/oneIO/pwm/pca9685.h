@@ -34,6 +34,7 @@ namespace oneIO::pwm {
     static constexpr uint8_t PCA_FULL_OFF   = (1<<4);
   }
 
+  /// @brief PCA9685 16-channel 12-bit PWM controller (I2C); setChannel(n, on, off) for duty cycle
   template<typename TwiMaster, uint8_t Addr = 0x40>
   struct PCA9685 {
     struct PwmDef { PwmDef() = delete; };

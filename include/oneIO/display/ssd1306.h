@@ -10,15 +10,7 @@ namespace oneIO::display {
     static void begin() {}
   };
 
-  // SSD1306 monochrome OLED driver — text mode, no host framebuffer.
-  // Streams characters directly to GDDRAM via the Transport policy.
-  // Width×Height: 128×64 (default) or 128×32.
-  //
-  // Transport must provide:
-  //   begin()                              — hardware init
-  //   cmd(uint8_t)                         — send one command byte
-  //   data(const uint8_t*, uint8_t len)    — send data bytes
-  //   fill(uint8_t byte, uint16_t count)   — fill GDDRAM efficiently
+  /// @brief SSD1306 OLED driver (128×64/32); streams characters directly to GDDRAM via Transport
   template<typename Transport, uint8_t Width = 128, uint8_t Height = 64>
   struct Ssd1306 {
     template<typename O>

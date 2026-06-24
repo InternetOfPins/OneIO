@@ -29,9 +29,7 @@ namespace oneIO::display {
     static void begin() {}
   };
 
-  // ── PCD8544 SPI transport ─────────────────────────────────────────────────
-  // Same interface as SpiSsd1306Transport — cmd/data/fill + begin with reset.
-
+  /// @brief SPI transport for Nokia 5110 PCD8544 LCD; RstPin=void to skip reset
   template<typename SpiMaster, typename CsPin, typename DcPin,
            typename RstPin = void>
   struct SpiPcd8544Transport {
@@ -70,8 +68,7 @@ namespace oneIO::display {
     }
   };
 
-  // ── PCD8544 driver ────────────────────────────────────────────────────────
-
+  /// @brief Nokia 5110 PCD8544 84×48 LCD driver; streams characters to display via Transport
   template<typename Transport, uint8_t Contrast = 0x3F>
   struct PCD8544 {
     template<typename O>

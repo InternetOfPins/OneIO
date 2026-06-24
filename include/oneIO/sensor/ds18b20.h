@@ -9,6 +9,7 @@
 
 namespace oneSensor {
 
+  /// @brief Dallas DS18B20 1-Wire temperature sensor; convert() + read() returns °C as fixed-point
   template<typename Bus>
   struct DS18B20 {
     struct Part {

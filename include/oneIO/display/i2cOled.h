@@ -10,8 +10,7 @@ namespace oneIO::display {
   // TwiMaster adapter for Arduino Wire library.
   // ArduinoWire<Wire, sda, scl> on ESP32/RP2040 (pin-configurable Wire::begin);
   // ArduinoWire<Wire> on AVR (default pins, no pin-config overload).
-  // begin() auto-detects which Wire::begin overload to call via SFINAE —
-  // the sda/scl args are silently ignored if the platform Wire doesn't support them.
+  /// @brief Arduino Wire I2C adapter; auto-detects begin(sda,scl) vs begin() via SFINAE
   template<TwoWire& wire, int sda = -1, int scl = -1>
   struct ArduinoWire {
     static void    begin()                       { _begin(wire); }
@@ -41,9 +40,7 @@ namespace oneIO::display {
   };
 #endif
 
-  // I2C transport for SSD1306.
-  // TwiMaster must provide begin_write(addr)/write_byte(b)/end_write().
-  // Addr: 0x3C (default) or 0x3D depending on SA0 pin.
+  /// @brief I2C transport for SSD1306; Addr 0x3C (default) or 0x3D depending on SA0 pin
   template<typename TwiMaster, uint8_t Addr = 0x3C>
   struct I2cSsd1306Transport {
     static void begin() { TwiMaster::begin(); }

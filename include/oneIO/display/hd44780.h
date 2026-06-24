@@ -24,8 +24,7 @@ namespace oneIO::display {
     static void begin() {}
   };
 
-  // HD44780 4-bit driver. RS, EN, D4..D7 are fully-configured IOP OutPin types.
-  // RW tied to GND (write-only — saves a pin, standard practice).
+  /// @brief HD44780 character LCD driver (4-bit, write-only); RS/EN/D4-D7 are IOP OutPin types
   template<typename RS, typename EN, typename D4, typename D5, typename D6, typename D7>
   struct Hd44780 {
     template<typename O>
