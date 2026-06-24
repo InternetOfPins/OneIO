@@ -1,6 +1,6 @@
 #pragma once
 #include <hapi/hapi.h>
-#include <tinyTimeUtils.h>
+#include <oneChip/clock.h>
 #include <stdint.h>
 #include <oneIO/display/font5x8.h>
 #include <oneIO/display/spiTft.h>
@@ -9,7 +9,7 @@ namespace oneIO::display {
 
   namespace st7735_detail {
 #ifndef ST7735_DELAY_MS
-#  define ST7735_DELAY_MS(ms) TinyTimeUtils::ms_delay(ms)
+#  define ST7735_DELAY_MS(ms) hw::delay_ms(ms)
 #endif
   }
 

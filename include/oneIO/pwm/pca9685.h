@@ -1,6 +1,6 @@
 #pragma once
 #include <hapi/hapi.h>
-#include <tinyTimeUtils.h>
+#include <oneChip/clock.h>
 #include <stdint.h>
 
 namespace oneIO::pwm {
@@ -43,7 +43,7 @@ namespace oneIO::pwm {
       static void begin(uint16_t freq_hz = 1000) {
         TwiMaster::begin();
         _write_reg(detail::PCA_MODE1, detail::PCA_ALLCALL);
-        TinyTimeUtils::ms_delay(1);
+        hw::delay_ms(1);
         _write_reg(detail::PCA_MODE2, detail::PCA_OUTDRV);
         set_freq(freq_hz);
         O::begin();
@@ -61,7 +61,7 @@ namespace oneIO::pwm {
         _write_reg(detail::PCA_MODE1, (old & 0x7F) | detail::PCA_SLEEP);
         _write_reg(detail::PCA_PRESCALE, uint8_t(prescale));
         _write_reg(detail::PCA_MODE1, old);
-        TinyTimeUtils::ms_delay(1);
+        hw::delay_ms(1);
         _write_reg(detail::PCA_MODE1, old | detail::PCA_AI);
       }
 

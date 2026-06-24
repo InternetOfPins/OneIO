@@ -17,8 +17,7 @@
     "OneBit":        "https://github.com/InternetOfPins/OneBit.git",
     "OnePin":        "https://github.com/InternetOfPins/OnePin.git",
     "OneChip":       "https://github.com/InternetOfPins/OneChip.git",
-    "OneBus":        "https://github.com/InternetOfPins/OneBus.git",
-    "tinyTimeUtils": "https://github.com/neu-rah/tinyTimeUtils.git"
+    "OneBus":        "https://github.com/InternetOfPins/OneBus.git"
   },
   "build": {
     "includeDir": "include"

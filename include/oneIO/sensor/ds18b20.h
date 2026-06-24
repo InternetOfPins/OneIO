@@ -6,7 +6,7 @@
 
 #pragma once
 #include <hapi/hapi.h>
-#include <tinyTimeUtils.h>
+#include <oneChip/clock.h>
 #include <stdint.h>
 
 namespace oneIO::sensor {
@@ -55,7 +55,7 @@ namespace oneIO::sensor {
 
       static Reading sample() {
         if (!trigger()) return { 0, false };
-        TinyTimeUtils::ms_delay(750);
+        hw::delay_ms(750);
         return read();
       }
     };

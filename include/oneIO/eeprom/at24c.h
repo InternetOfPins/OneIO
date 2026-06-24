@@ -1,6 +1,6 @@
 #pragma once
 #include <hapi/hapi.h>
-#include <tinyTimeUtils.h>
+#include <oneChip/clock.h>
 #include <stdint.h>
 
 namespace oneIO::eeprom {
@@ -42,7 +42,7 @@ namespace oneIO::eeprom {
         TwiMaster::write_byte(uint8_t(addr));
         for (uint8_t i = 0; i < n; i++) TwiMaster::write_byte(*buf++);
         TwiMaster::end_write();
-        TinyTimeUtils::ms_delay(5);
+        hw::delay_ms(5);
         addr += n; len -= n;
       }
     }

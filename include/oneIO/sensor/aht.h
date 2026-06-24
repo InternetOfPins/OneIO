@@ -1,6 +1,6 @@
 #pragma once
 #include <hapi/hapi.h>
-#include <tinyTimeUtils.h>
+#include <oneChip/clock.h>
 #include <stdint.h>
 
 namespace oneIO::sensor {
@@ -45,16 +45,16 @@ namespace oneIO::sensor {
       static void begin() {
         TwiMaster::begin();
         _reset();
-        TinyTimeUtils::ms_delay(20);
+        hw::delay_ms(20);
         _init();
-        TinyTimeUtils::ms_delay(10);
+        hw::delay_ms(10);
         O::begin();
       }
 
       // Trigger a measurement and block until data ready (~80ms).
       static bool measure() {
         _trigger();
-        TinyTimeUtils::ms_delay(80);
+        hw::delay_ms(80);
         return _read();
       }
 
