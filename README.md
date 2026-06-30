@@ -1,5 +1,7 @@
 # OneIO
 
+**HAPI Compatibility:** Works with new Check/Apply/ApplyPack API (2026-Q2)
+
 IOP hardware I/O device drivers — displays, sensors, EEPROM, PWM, RTC, RF. Pure-static HAPI components; no host-side buffers, no dynamic allocation.
 
 Part of the [InternetOfPins](https://github.com/InternetOfPins) project family.
