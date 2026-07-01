@@ -1,0 +1,21 @@
+{
+  "name": "ucglib-core",
+  "version": "1.5.2-core",
+  "description": "Trimmed, framework-free core of olikraus/Ucglib (BSD-2-Clause) — device drivers, draw primitives, and font tables. Excludes only the Arduino C++ wrapper (Ucglib.cpp), which unconditionally includes SPI.h and won't compile without the Arduino framework. IOP's Ucglib backend (oneIO/display/ucgSpi.h) talks to this core directly via its own com_cb HAL.",
+  "keywords": "tft, color, gfx, ucglib",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/olikraus/Ucglib_Arduino.git"
+  },
+  "authors": [
+    { "name": "Oliver Kraus", "email": "olikraus@gmail.com", "maintainer": true }
+  ],
+  "license": "BSD-2-Clause",
+  "homepage": "https://github.com/olikraus/Ucglib_Arduino",
+  "build": {
+    "srcDir": "include",
+    "includeDir": "include"
+  },
+  "frameworks": "*",
+  "platforms": "*"
+}

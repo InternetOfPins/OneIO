@@ -1,6 +1,6 @@
 #pragma once
 #include <stdint.h>
-#include <type_traits>
+#include <hapi/hapi.h>  // pulls std::is_same polyfill on AVR (no <type_traits> there)
 
 namespace oneIO::display {
 

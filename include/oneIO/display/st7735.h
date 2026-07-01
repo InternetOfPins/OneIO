@@ -47,7 +47,10 @@ namespace oneIO::display {
            uint8_t Xoffset = 0,
            uint8_t Yoffset = 0>
   struct St7735 {
-    struct TftDef { TftDef() = delete; };
+    struct TftDef {
+      TftDef() = delete;
+      static void begin() {}
+    };
     using Api = hapi::APIOf<TftDef, St7735<Transport, Width, Height, Madctl, Xoffset, Yoffset>>;
 
     template<typename O>

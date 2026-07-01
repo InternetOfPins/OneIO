@@ -21,7 +21,10 @@ namespace oneIO::sensor {
   /// @brief MAX31855 SPI thermocouple amplifier; read() returns temp_c + fault bits
   template<typename SpiMaster, typename CsPin>
   struct MAX31855 {
-    struct SensorDef { SensorDef() = delete; };
+    struct SensorDef {
+      SensorDef() = delete;
+      static void begin() {}
+    };
 
     struct Reading {
       int16_t tc_raw;   // 14-bit signed thermocouple ticks (0.25 °C each)
