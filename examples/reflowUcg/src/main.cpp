@@ -53,6 +53,9 @@ using Ucg    = UcgSpiDisplay<ucg_dev_st7735_18x128x160, ucg_ext_st7735_18,
 using TcCs = AVR::OutPin<Pins<PD7>, chip::PortD>;
 using Tc   = MAX31855<Spi, TcCs>::Api;
 
+// Heater SSR control line: D6(PD6), active-high.
+using Heater = AVR::OutPin<Pins<PD6>, chip::PortD>;
+
 // Rotary encoder: A=A0(PC0), B=A1(PC1); push switch SW=A2(PC2). PCINT1 group.
 using EncHW = hapi::APIOf<oneInput::InputDef,
   oneInput::Encoder,
@@ -182,6 +185,49 @@ static void printNum(int32_t n) {
   Ucg::print(&buf[i]);
 }
 
+// ── PID + SSR time-proportioning control ─────────────────────────────────────
+// Gains below are placeholders, not tuned against a real oven — the thermal
+// mass/lag of an actual heater+PCB stack needs real-world tuning (start with
+// Kp, add Ki once the steady-state offset is visible, add Kd last to tame
+// overshoot). Output is a 0-100% duty cycle; a real SSR can't be fast-PWMed,
+// so it's applied via time-proportioning: ON for duty% of each PID_WINDOW_MS
+// window rather than actually switching at PID_HZ.
+struct PID {
+  float kp, ki, kd, maxOut;
+  float integral   = 0;
+  float prevError  = 0;
+
+  float update(float target, float current, float dt_s) {
+    float error = target - current;
+    integral += error * dt_s;
+    float iTerm = ki * integral;
+    if (iTerm > maxOut)     { iTerm = maxOut; integral = iTerm / ki; }
+    else if (iTerm < 0.0f)  { iTerm = 0.0f;   integral = 0.0f; }
+    float dTerm = kd * (error - prevError) / dt_s;
+    prevError = error;
+    float out = kp * error + iTerm + dTerm;
+    if (out > maxOut) out = maxOut;
+    if (out < 0.0f)   out = 0.0f;
+    return out;
+  }
+};
+
+static constexpr float    SAFETY_MAX_C   = 280.0f;  // hard cutoff regardless of PID
+static constexpr uint16_t PID_WINDOW_MS  = 2000;    // SSR on/off window
+PID      pid{/*kp*/4.0f, /*ki*/0.02f, /*kd*/6.0f, /*maxOut*/100.0f};
+float    dutyPercent  = 0;
+uint32_t windowStartMs;
+
+// Slices the current PID_WINDOW_MS window into an ON/OFF period per dutyPercent.
+// Call every loop tick (not just once per control update) so the SSR actually
+// switches mid-window.
+static void driveHeater() {
+  uint32_t now = SysTick::millis();
+  if (now - windowStartMs >= PID_WINDOW_MS) windowStartMs = now;
+  uint32_t dutyMs = uint32_t(dutyPercent * (PID_WINDOW_MS / 100.0f));
+  if ((now - windowStartMs) < dutyMs) Heater::on(); else Heater::off();
+}
+
 // ── Run modes ─────────────────────────────────────────────────────────────────
 using RunFn = bool(*)();
 RunFn activeRun;
@@ -201,6 +247,7 @@ uint32_t processStartMs;
 bool     processDone;
 
 void showMenu() {
+  Heater::off();
   activeRun = mainRun;
   display.lockMode(LockMode::None);
   display.clear();
@@ -224,11 +271,19 @@ bool processRun() {
     if (!processDone) {
       auto r = Tc::read();
       if (r.ok) {
+        float currentC = r.tc_raw / 4.0f;
         uint8_t col = uint8_t((uint32_t(elapsed_s) * (Ucg::kWidth - 1)) / p.totalS);
         if (col >= Ucg::kWidth) col = Ucg::kWidth - 1;
         Ucg::setColor(0, LIVE_COLOR[0], LIVE_COLOR[1], LIVE_COLOR[2]);
         Ucg::drawPixel(col, yForTemp(int16_t(r.tc_raw / 4)));
+
+        if (currentC >= SAFETY_MAX_C) dutyPercent = 0;  // hard cutoff, bypasses PID
+        else dutyPercent = pid.update(float(targetTempAt(p, elapsed_s)), currentC, 1.0f);
+      } else {
+        dutyPercent = 0;  // sensor fault — heater off
       }
+    } else {
+      dutyPercent = 0;  // profile finished — let it cool
     }
 
     Ucg::setCursor(0, 0);
@@ -237,16 +292,24 @@ bool processRun() {
       processDone = true;
       Ucg::print("Done - press btn");
     } else {
-      printNum(elapsed_s); Ucg::print('/'); printNum(p.totalS); Ucg::print("s   ");
+      printNum(elapsed_s); Ucg::print('/'); printNum(p.totalS);
+      Ucg::print(" H:"); printNum(int32_t(dutyPercent)); Ucg::print("%  ");
     }
   }
+
+  driveHeater();  // every tick, not just once a second — this is what actually
+                   // slices dutyPercent into the SSR's on/off window.
   return running;
 }
 
 bool action::start(Sz) {
   activeRun       = processRun;
   processStartMs  = SysTick::millis();
+  windowStartMs   = processStartMs;
   processDone     = false;
+  dutyPercent     = 0;
+  pid.integral    = 0;
+  pid.prevError   = 0;
   Ucg::clear();
   drawReferenceCurve(profiles[profileIdx]);
   return true;
@@ -259,6 +322,8 @@ void setup() {
   Tc::begin();
   EncHW::begin();
   BtnHW::begin();
+  Heater::begin();
+  Heater::off();
 
   display.lockMode(LockMode::None);
   display.clear();
