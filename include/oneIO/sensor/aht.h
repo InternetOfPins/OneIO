@@ -37,7 +37,10 @@ namespace oneIO::sensor {
   struct AHT {
     static_assert(oneBus::is_twi_master<TwiMaster>::value,
       "TwiMaster must satisfy oneBus::is_twi_master — see OneBus/twiMaster.h");
-    struct SensorDef { SensorDef() = delete; };
+    struct SensorDef {
+      SensorDef() = delete;
+      static void begin() {}
+    };
 
     template<typename O>
     struct Part : O {

@@ -26,7 +26,10 @@ namespace oneIO::storage {
   /// @brief Arduino SD library wrapper; read/write at flat byte offsets — compatible with EepromStore<> backing
   template<uint8_t CsPin, const char* Filename>
   struct SDCard {
-    struct StoreDef { StoreDef() = delete; };
+    struct StoreDef {
+      StoreDef() = delete;
+      static void begin() {}
+    };
 
     template<typename O>
     struct Part : O {

@@ -22,7 +22,10 @@ namespace oneIO::gpio {
     static_assert(oneBus::is_twi_master<TwiMaster>::value,
       "TwiMaster must satisfy oneBus::is_twi_master — see OneBus/twiMaster.h");
 
-    struct GpioDef { GpioDef() = delete; };
+    struct GpioDef {
+      GpioDef() = delete;
+      static void begin() {}
+    };
 
     template<typename O>
     struct Part : O {

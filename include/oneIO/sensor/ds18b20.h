@@ -21,7 +21,10 @@ namespace oneIO::sensor {
   /// @brief DS18B20 1-Wire temperature sensor; sample() returns Reading with tempC()
   template<typename OneWireBus>
   struct DS18B20 {
-    struct SensorDef { SensorDef() = delete; };
+    struct SensorDef {
+      SensorDef() = delete;
+      static void begin() {}
+    };
     using Api = hapi::APIOf<SensorDef, DS18B20<OneWireBus>>;
 
     struct Reading {

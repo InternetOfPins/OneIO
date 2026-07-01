@@ -39,7 +39,10 @@ namespace oneIO::pwm {
   struct PCA9685 {
     static_assert(oneBus::is_twi_master<TwiMaster>::value,
       "TwiMaster must satisfy oneBus::is_twi_master — see <oneBus/twiMaster.h>");
-    struct PwmDef { PwmDef() = delete; };
+    struct PwmDef {
+      PwmDef() = delete;
+      static void begin() {}
+    };
 
     template<typename O>
     struct Part : O {
