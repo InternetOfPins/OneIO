@@ -45,11 +45,11 @@ using OledRst = AVR::OutPin<Pins<PB0>, chip::PortB>;
 // "_1" tile Setup — 8px-row buffer, most redraw passes, least RAM.
 using Oled = U8g2SpiDisplay<u8g2_Setup_ssd1306_128x64_noname_1, Spi, OledCs, OledDc, OledRst>;
 
-using EncHW = hapi::APIOf<oneInput::InputDef,
+using EncHW = oneInput::InputDef<
   oneInput::Encoder,
   oneInput::avr::AvrEncPins</*group*/1, chip::PortC, /*bitA*/0, /*bitB*/1>
 >;
-using BtnHW = hapi::APIOf<oneInput::InputDef,
+using BtnHW = oneInput::InputDef<
   oneInput::BtnCapture,
   oneInput::Hold<800>,
   oneInput::Click<300>,

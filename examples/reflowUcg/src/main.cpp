@@ -57,11 +57,11 @@ using Tc   = MAX31855<Spi, TcCs>::Api;
 using Heater = AVR::OutPin<Pins<PD6>, chip::PortD>;
 
 // Rotary encoder: A=A0(PC0), B=A1(PC1); push switch SW=A2(PC2). PCINT1 group.
-using EncHW = hapi::APIOf<oneInput::InputDef,
+using EncHW = oneInput::InputDef<
   oneInput::Encoder,
   oneInput::avr::AvrEncPins</*group*/1, chip::PortC, /*bitA*/0, /*bitB*/1>
 >;
-using BtnHW = hapi::APIOf<oneInput::InputDef,
+using BtnHW = oneInput::InputDef<
   oneInput::BtnCapture,
   oneInput::Hold<800>,
   oneInput::Click<300>,
