@@ -117,7 +117,26 @@ namespace oneIO::display {
         _set_pos(_col, _page);
       }
       static constexpr uint8_t charWidth()    { return 6; }  // font5x8: 5px glyph + 1px gap
-      static constexpr uint8_t lineSpacing()  { return 1; }  // line advance in pages (1 page = 8px)
+      static constexpr uint8_t lineSpacing()  { return 1; }  // line advance in pages (1 page = 8px) — fixed, compile-time
+      // Dynamic counterpart of lineSpacing(), for OneMenu's Cursor<CharW,LineH,Adv,LnH> LnH slot
+      // (out.h): _big_font doubles the pixel height of the *current* row at runtime, so a fixed
+      // line-advance constant silently desyncs logical cursor position from what's actually on
+      // the panel the moment setBigFont(true) is active. Return type must be exactly `int`
+      // (oneMenu::Sz) — Cursor's LnH NTTP is a plain `int(*)()` function pointer, and function
+      // pointer types don't unify across different return types even when implicitly convertible.
+      static int lineHeight() { return _big_font ? 2 : 1; }
+      // Dynamic counterpart of charWidth(), for Cursor<CharW,LineH,Adv,LnH>'s Adv slot: print_big()
+      // actually draws 12px-wide glyphs (10 glyph + 2 gap), not the fixed 6px charWidth() — every
+      // consumer of glyphWidth() (Cursor::put()'s own x bookkeeping, and clearToEOL()'s space-count
+      // for padding/clearLine()) silently assumed 6px even while big font was active, so padding
+      // printed roughly 2x too many "big" space glyphs, overran the row, and print_big()'s own
+      // wrap-on-overflow logic (`_col+12>Width`) kept dragging it into and overwriting subsequent
+      // pages — the actual mechanism behind the all-black screen once big-font items were added,
+      // not just the line-height mismatch lineHeight() above already fixed. Adv's signature ignores
+      // its char argument here (unlike a truly proportional font) since big/small is a single
+      // runtime toggle, not per-glyph. Return type must be exactly `int` (oneMenu::Sz), same
+      // exact-function-pointer-type reasoning as lineHeight().
+      static int glyphAdvance(char) { return _big_font ? 12 : 6; }
 
       static void print(char c) {
         if(_big_font) { print_big(c); return; }
