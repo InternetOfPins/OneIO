@@ -198,6 +198,7 @@ Pwm::setChannel(0, 307);    // channel 0, ~1.5 ms pulse (centre)
 
 - [HAPI](https://github.com/InternetOfPins/HAPI)
 - [OneBit](https://github.com/InternetOfPins/OneBit)
+- [OnePin](https://github.com/InternetOfPins/OnePin)
 - [OneChip](https://github.com/InternetOfPins/OneChip)
 - [OneBus](https://github.com/InternetOfPins/OneBus)
 
