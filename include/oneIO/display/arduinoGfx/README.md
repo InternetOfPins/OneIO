@@ -225,7 +225,7 @@ verified end-to-end on real hardware, not just compiled/linked.
 own one-example-every-board reference sketch -- has a `#ifdef
 USE_HAPI_BACKEND` branch (undefined by default, so every existing board
 target compiles and runs exactly as before): `#include
-"Arduino_GFX_HAPI_backend.h"` (a new file, in that example's own folder,
+"Arduino_GFX_OneIO_backend.h"` (a new file, in that example's own folder,
 which in turn includes the classes here) instead of the stock
 `Arduino_GFX_pins.h`/`Arduino_GFX_databus.h`/`Arduino_GFX_display.h` path.
 `gfx` ends up a real pointer to a concrete type
