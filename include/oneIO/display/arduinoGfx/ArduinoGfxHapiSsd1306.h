@@ -1,17 +1,17 @@
 #pragma once
-// Bridges the Arduino_GFX fork's HAPI-composed I2C bus
-// (hapi_gfx::Arduino_Wire_HAPI<I2cAddr,CommandPrefix,DataPrefix>, see
-// Arduino_GFX/src/hapi/Arduino_Wire_HAPI.h) into OneIO's published
+// Bridges hapi_gfx::Arduino_Wire_HAPI<I2cAddr,CommandPrefix,DataPrefix>
+// (Arduino_Wire_HAPI.h, in this same directory) into OneIO's own native
 // Ssd1306<Transport,W,H> driver (font rendering / print / fillRect / OledOut
-// compatibility, already used by I2cOled) as its byte-level Transport.
+// compatibility, already used by I2cOled -- see ../ssd1306.h) as its
+// byte-level Transport.
 //
-// Kept local to this example rather than added to OneIO's own include/ tree:
-// it's just a template usage of two independently-published libraries, not a
-// piece either library needs to own, and this example already depends on
-// unpublished local edits to Arduino_GFX -- no reason to also grow OneIO's
-// public surface for a demo.
+// This is the "OneMenu driven through the Arduino_GFX HAPI adapters"
+// integration point: Arduino_Wire_HAPI supplies the actual I2C register
+// writes, OneIO/OneMenu supply the rest unchanged (Ssd1306<>, OledDisplay<>/
+// GfxFmt<>). See OneIO/examples/arduinoGfxHapiMenu/ for a full working
+// example, and README.md in this directory for the wider design writeup.
 #include <oneIO/display/ssd1306.h>
-#include <hapi/Arduino_Wire_HAPI.h>
+#include <oneIO/display/arduinoGfx/Arduino_Wire_HAPI.h>
 
 namespace oneIO::display {
 
@@ -49,8 +49,8 @@ namespace oneIO::display {
     }
   };
 
-  // Ready-to-use OledOut-compatible SSD1306, driven by Arduino_GFX HAPI's I2C bus.
-  // Bus = hapi_gfx::Arduino_Wire_HAPI<I2cAddr, CommandPrefix, DataPrefix>
+  // Ready-to-use OledOut-compatible SSD1306, driven by the Arduino_GFX HAPI
+  // adapters' I2C bus. Bus = hapi_gfx::Arduino_Wire_HAPI<I2cAddr, CommandPrefix, DataPrefix>
   template<typename Bus, uint8_t Width = 128, uint8_t Height = 64>
   using ArduinoGfxHapiSsd1306 = hapi::APIOf<OledDef, Ssd1306<ArduinoGfxHapiSsd1306Transport<Bus>, Width, Height>>;
 

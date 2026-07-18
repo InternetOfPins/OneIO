@@ -1,30 +1,35 @@
 /**
- * @brief OneMenu driven through the Arduino_GFX fork's HAPI-composed I2C bus.
+ * @brief OneMenu driven through the Arduino_GFX HAPI adapters' I2C bus.
  *
- * Arduino_GFX HAPI supplies the real hardware: hapi_gfx::Arduino_Wire_HAPI
- * (compile-time I2C address/control-byte bus, see
- * Arduino_GFX/src/hapi/Arduino_Wire_HAPI.h) does the actual register writes.
- * OneIO/OneMenu supply the rest, entirely unchanged: Ssd1306<> (font
- * rendering, print/fillRect, already OledOut-compatible) and OledDisplay<>/
- * GfxFmt<> (the OneMenu output chain, proven on real AVR hardware by the
- * u8g2Oled example). oneIO/display/arduinoGfxHapiSsd1306.h is the ~40-line
- * bridge connecting the two: an Ssd1306 Transport backed by the HAPI bus
- * instead of OneBus's TwiMaster.
+ * hapi_gfx::Arduino_Wire_HAPI (compile-time I2C address/control-byte bus,
+ * oneIO/display/arduinoGfx/Arduino_Wire_HAPI.h) does the actual register
+ * writes. OneIO/OneMenu supply the rest, entirely unchanged: Ssd1306<>
+ * (font rendering, print/fillRect, already OledOut-compatible) and
+ * OledDisplay<>/GfxFmt<> (the OneMenu output chain, proven on real AVR
+ * hardware by the u8g2Oled example).
+ * oneIO/display/arduinoGfx/ArduinoGfxHapiSsd1306.h is the bridge connecting
+ * the two: an Ssd1306 Transport backed by the HAPI bus instead of OneBus's
+ * TwiMaster. See that directory's README.md for the wider design writeup
+ * (including why these hapi_gfx:: classes live in OneIO rather than in the
+ * Arduino_GFX fork they reuse register defines/init sequences from).
  *
  * Hardware: any ESP32 devkit + SSD1306 128x64 I2C OLED on the default I2C
  * pins (SDA=21, SCL=22). Navigation over USB serial (arrow keys, Enter/Esc).
+ * The I2C path here (Arduino_Wire_HAPI + Arduino_SSD1306_HAPI, close cousin
+ * of the Ssd1306<> bridged here) was verified end-to-end on a real LOLIN32's
+ * onboard OLED -- see oneIO/display/arduinoGfx/README.md, "verified on real
+ * hardware".
  */
 #include <Arduino.h>
 
 #include <hapi/hapi.h>
-#include <hapi/Arduino_Wire_HAPI.h>
 #include <oneData/oneData.h>
 #include <oneItem/oneItem.h>
 #include <oneOutput/oneOutput.h>
 #include <oneMenu/oneMenu.h>
 #include <oneMenu/menu/IO/arduino/serialIn.h>
 #include <oneMenu/menu/IO/IOP/oledOut.h>
-#include "gfxHapiTransport.h"
+#include <oneIO/display/arduinoGfx/ArduinoGfxHapiSsd1306.h>
 
 using namespace hapi;
 using namespace oneData;
