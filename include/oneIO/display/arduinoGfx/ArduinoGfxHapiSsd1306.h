@@ -8,7 +8,7 @@
 // This is the "OneMenu driven through the Arduino_GFX HAPI adapters"
 // integration point: Arduino_Wire_HAPI supplies the actual I2C register
 // writes, OneIO/OneMenu supply the rest unchanged (Ssd1306<>, OledDisplay<>/
-// GfxFmt<>). See OneIO/examples/arduinoGfxHapiMenu/ for a full working
+// GfxFmt<>). See OneIO/examples/arduinoGfxMenu/ for a full working
 // example, and README.md in this directory for the wider design writeup.
 #include <oneIO/display/ssd1306.h>
 #include <oneIO/display/arduinoGfx/Arduino_Wire_HAPI.h>

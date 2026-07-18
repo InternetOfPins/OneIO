@@ -99,7 +99,7 @@ story.
 A real IOP OneMenu instance, rendered via `Arduino_Wire_HAPI` bridged into
 OneIO's own existing, already-OledOut-compatible `Ssd1306<Transport,W,H>`
 driver (the *unrelated* native one in the parent `display/` directory) as
-its byte-level I2C transport, lives at `OneIO/examples/arduinoGfxHapiMenu/`.
+its byte-level I2C transport, lives at `OneIO/examples/arduinoGfxMenu/`.
 OneMenu's own output chain (`OledDisplay<>`, `GfxFmt<>`, font rendering) is
 reused entirely unchanged, already proven on real AVR hardware by this
 project's `u8g2Oled` example. `Arduino_Wire_HAPI` supplies the actual
