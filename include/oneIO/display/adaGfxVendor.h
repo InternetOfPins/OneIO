@@ -82,4 +82,47 @@ namespace oneIO::display {
     static constexpr uint8_t lineSpacing() { return CharH; }
   };
 
+  // Buffered variant — for a concrete Adafruit_GFX-derived driver that
+  // genuinely double-buffers and needs an explicit display() call after
+  // drawing (Adafruit_PCD8544/Nokia 5110, Adafruit_SSD1306, etc.) — the
+  // real gap AdaGfxVendor's own header comment above flags: Adafruit_GFX's
+  // base class has no virtual display()/flush(), so a plain Adafruit_GFX&
+  // can't reach it. Bound to the CONCRETE vendor type (VendorT), not the
+  // polymorphic base, so display() resolves as an ordinary non-virtual
+  // call — same "flush() reaches the real buffered vendor call" shape as
+  // U8g2Vendor's own flush()->sendBuffer().
+  template<typename VendorT, uint8_t Width, uint8_t Height, uint8_t CharW, uint8_t CharH,
+           uint16_t FgColor = 0xFFFF, uint16_t BgColor = 0x0000>
+  struct AdaGfxBufferedVendor {
+    static constexpr uint8_t kWidth  = Width;
+    static constexpr uint8_t kHeight = Height;
+
+    inline static VendorT* driver = nullptr;
+    inline static bool     _inv   = false;
+
+    static void begin(VendorT& d) { driver = &d; }
+
+    static void print(char c) {
+      driver->setTextColor(_inv ? BgColor : FgColor);
+      driver->write((uint8_t)c);
+    }
+    static void print(const char* s) { while (*s) print(*s++); }
+
+    static void setCursor(uint8_t x, uint8_t y) { driver->setCursor(x, y); }
+    static void setBigFont(bool) {}
+    static void clear() { driver->fillScreen(BgColor); }
+    static void flush() { driver->display(); }
+    static void setInverted(bool v) { _inv = v; }
+
+    static void fillRect(uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t = 0) {
+      driver->fillRect(x, y, w, h, _inv ? FgColor : BgColor);
+    }
+    static void drawRoundRect(uint8_t x, uint8_t y, uint8_t w, uint8_t r) {
+      driver->fillRoundRect(x, y, w, CharH, r, _inv ? FgColor : BgColor);
+    }
+
+    static constexpr uint8_t charWidth()   { return CharW; }
+    static constexpr uint8_t lineSpacing() { return CharH; }
+  };
+
 } // oneIO::display
