@@ -1,5 +1,7 @@
 # OneIO
 
+<img src="logo.png" alt="OneIO logo" width="64" height="64">
+
 **HAPI Compatibility:** Works with new Check/Apply/ApplyPack API (2026-Q2)
 
 IOP hardware I/O device drivers — displays, sensors, EEPROM, PWM, RTC, RF. Pure-static HAPI components; no host-side buffers, no dynamic allocation.
