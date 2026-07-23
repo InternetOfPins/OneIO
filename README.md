@@ -1,6 +1,4 @@
-# OneIO
-
-<img src="logo.png" alt="OneIO logo" width="64" height="64">
+# <img src="logo.png" alt="OneIO logo" width="32" height="32"> OneIO
 
 **HAPI Compatibility:** Works with new Check/Apply/ApplyPack API (2026-Q2)
 
