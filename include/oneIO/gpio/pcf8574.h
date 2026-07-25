@@ -55,6 +55,21 @@ namespace oneIO::gpio {
     using Api = hapi::APIOf<GpioDef, PCF8574<TwiMaster, Addr>>;
   };
 
+  /// @brief one PCF8574 pin, satisfying the same minimal begin()/on()/off()
+  /// contract any IOP `OutPin` gives a driver like `oneIO::display::
+  /// Hd44780<RS,EN,D4,D5,D6,D7>` — Expander is a `PCF8574<TwiMaster,Addr>`
+  /// instance (its own begin() opens the I2C bus once; calling it again per
+  /// pin is harmless, same idempotent-begin() convention every IOP terminal
+  /// already follows). Lets a driver written against real hardware OutPins
+  /// run unmodified over an I2C GPIO expander instead — same driver, pins
+  /// swapped, not a second driver implementation.
+  template<typename Expander, uint8_t Bit>
+  struct PCF8574Pin {
+    static void begin() { Expander::begin(); }
+    static void on()    { Expander::set(uint8_t(1) << Bit); }
+    static void off()   { Expander::clr(uint8_t(1) << Bit); }
+  };
+
 } // oneIO::gpio
 
 #ifdef ARDUINO
