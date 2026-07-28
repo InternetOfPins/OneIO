@@ -136,7 +136,7 @@ auto mainMenu = menuDef<WrapNav>(
   )
 );
 
-NavDef<TreeNav, Root<decltype(mainMenu), mainMenu>> nav;
+NavDef<TreeNav, Root<mainMenu>> nav;
 
 // ── Curve plot ────────────────────────────────────────────────────────────────
 // Header text occupies the top 2 char-rows (16px); the plot below it draws at

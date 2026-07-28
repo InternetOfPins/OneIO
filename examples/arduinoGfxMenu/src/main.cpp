@@ -66,7 +66,7 @@ auto mainMenu = menuDef<WrapNav>(
   )
 );
 
-NavDef<TreeNav, Root<decltype(mainMenu), mainMenu>> nav;
+NavDef<TreeNav, Root<mainMenu>> nav;
 InDef<SerialIn> in;
 
 void setup() {

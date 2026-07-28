@@ -138,7 +138,7 @@ auto mainMenu = menuDef<WrapNav>(
   )
 );
 
-NavDef<TreeNav, Root<decltype(mainMenu), mainMenu>> nav;
+NavDef<TreeNav, Root<mainMenu>> nav;
 
 // ── Curve plot ────────────────────────────────────────────────────────────────
 // Header text on page 0; plot fills the remaining pages. Temp axis 0-260°C,
