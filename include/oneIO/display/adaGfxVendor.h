@@ -33,6 +33,14 @@ namespace oneIO::display {
   // every real display this wrapper is meant for; CharW/CharH stay uint8_t
   // (character cell sizes are always small).
   //
+  // setColors(fg,bg): FgColor/BgColor NTTPs above are now only the *initial*
+  // m_fg/m_bg values — a real per-role/state palette is reachable via
+  // OneMenu's GfxColorFmt + ColorTable<Color<uint16_t>::Table<...>>, which
+  // calls setColors() the same way ANSIFmt calls ANSIOut's setColors(). This
+  // lifts the "2-color-only" limitation below for GfxColorFmt users; GfxFmt's
+  // own invert-only (_inv) users are unaffected — _inv still swaps between
+  // whatever m_fg/m_bg currently hold.
+  //
   // flush(): a no-op by default. Most concrete Adafruit_GFX drivers (real
   // SPI/parallel TFTs — ST7735, ILI9341, etc.) push each draw call
   // immediately, no local RAM framebuffer, nothing to flush. This does NOT
@@ -61,31 +69,37 @@ namespace oneIO::display {
 
     inline static Adafruit_GFX* driver = nullptr;
     inline static bool          _inv   = false;
+    inline static uint16_t      m_fg   = FgColor;
+    inline static uint16_t      m_bg   = BgColor;
 
     // Call once, with a real, already-constructed AND already-begin()'d
     // (init()/begin() varies per concrete driver, so left to the caller)
     // Adafruit_GFX-derived instance.
     static void begin(Adafruit_GFX& d) { driver = &d; }
 
+    // Real per-role/state color pair — see file header comment. _inv still
+    // swaps between whichever m_fg/m_bg are currently set.
+    static void setColors(uint16_t fg, uint16_t bg) { m_fg=fg; m_bg=bg; }
+
     static void print(char c) {
-      driver->setTextColor(_inv ? BgColor : FgColor);
+      driver->setTextColor(_inv ? m_bg : m_fg);
       driver->write((uint8_t)c);
     }
     static void print(const char* s) { while (*s) print(*s++); }
 
     static void setCursor(uint16_t x, uint16_t y) { driver->setCursor(x, y); }
     static void setBigFont(bool) {}  // no big/small font toggle — disclosed simplification
-    static void clear() { driver->fillScreen(BgColor); }
+    static void clear() { driver->fillScreen(m_bg); }
     static void flush() {}  // see file header comment
     static void setInverted(bool v) { _inv = v; }
 
     // byte (Ssd1306-specific XOR-fill-value) is ignored — the real fill
-    // color is always FgColor/BgColor via _inv instead, see header comment.
+    // color is always m_fg/m_bg via _inv instead, see header comment.
     static void fillRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t = 0) {
-      driver->fillRect(x, y, w, h, _inv ? FgColor : BgColor);
+      driver->fillRect(x, y, w, h, _inv ? m_fg : m_bg);
     }
     static void drawRoundRect(uint16_t x, uint16_t y, uint16_t w, uint16_t r) {
-      driver->fillRoundRect(x, y, w, CharH, r, _inv ? FgColor : BgColor);
+      driver->fillRoundRect(x, y, w, CharH, r, _inv ? m_fg : m_bg);
     }
 
     static constexpr uint8_t charWidth()   { return CharW; }
@@ -107,28 +121,32 @@ namespace oneIO::display {
     static constexpr uint16_t kWidth  = Width;
     static constexpr uint16_t kHeight = Height;
 
-    inline static VendorT* driver = nullptr;
-    inline static bool     _inv   = false;
+    inline static VendorT*  driver = nullptr;
+    inline static bool      _inv   = false;
+    inline static uint16_t  m_fg   = FgColor;
+    inline static uint16_t  m_bg   = BgColor;
 
     static void begin(VendorT& d) { driver = &d; }
 
+    static void setColors(uint16_t fg, uint16_t bg) { m_fg=fg; m_bg=bg; }
+
     static void print(char c) {
-      driver->setTextColor(_inv ? BgColor : FgColor);
+      driver->setTextColor(_inv ? m_bg : m_fg);
       driver->write((uint8_t)c);
     }
     static void print(const char* s) { while (*s) print(*s++); }
 
     static void setCursor(uint16_t x, uint16_t y) { driver->setCursor(x, y); }
     static void setBigFont(bool) {}
-    static void clear() { driver->fillScreen(BgColor); }
+    static void clear() { driver->fillScreen(m_bg); }
     static void flush() { driver->display(); }
     static void setInverted(bool v) { _inv = v; }
 
     static void fillRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint8_t = 0) {
-      driver->fillRect(x, y, w, h, _inv ? FgColor : BgColor);
+      driver->fillRect(x, y, w, h, _inv ? m_fg : m_bg);
     }
     static void drawRoundRect(uint16_t x, uint16_t y, uint16_t w, uint16_t r) {
-      driver->fillRoundRect(x, y, w, CharH, r, _inv ? FgColor : BgColor);
+      driver->fillRoundRect(x, y, w, CharH, r, _inv ? m_fg : m_bg);
     }
 
     static constexpr uint8_t charWidth()   { return CharW; }
