@@ -89,9 +89,10 @@ namespace oneIO::display {
     // m_customFont tracks which of the two cached heights below applies —
     // see lineHeight()'s own comment for why this is cache-based, not a live
     // per-call query.
-    inline static bool     m_customFont  = false;
-    inline static uint16_t m_baseFontH   = CharH;
-    inline static uint16_t m_customFontH = CharH;
+    inline static bool     m_customFont       = false;
+    inline static uint16_t m_baseFontH        = CharH;
+    inline static uint16_t m_customFontH      = CharH;
+    inline static uint16_t m_customFontAscent = 0;
     static void setFont(const GFXfont* f) { driver->setFont(f); m_customFont = (f != nullptr); }
 
     // Real per-font line height, MEASURED ONCE (not queried live) — see
@@ -118,6 +119,22 @@ namespace oneIO::display {
       driver->getTextBounds(sample, 0, 100, &x1, &y1, &w, &h);
       return h > 0 ? h : CharH;
     }
+    // Ascent: how far ABOVE the baseline the glyph's real top edge sits.
+    // Needed because Adafruit_GFX treats setCursor()'s y as TOP-LEFT for the
+    // built-in font but as BASELINE for any custom GFXfont — every OneMenu
+    // Fmt component (GfxColorFmt included) works in top-left coordinates
+    // uniformly, with no notion of "baseline" at all. Without this offset, a
+    // custom font's real ascent renders ABOVE m_itemPos.y — found on real
+    // hardware: with Title starting at y=0, the title glyphs rendered
+    // partially/fully above the physical top edge of the panel, invisible.
+    // getTextBounds()'s y1 (top of the real pixel bbox) comes back relative
+    // to the 100px arbitrary anchor passed below, so "100 - y1" is the
+    // ascent in pixels; y1>=100 (no ascender in the sample) clamps to 0.
+    static uint16_t measureAscent(const char* sample="Mg") {
+      int16_t x1, y1; uint16_t w, h;
+      driver->getTextBounds(sample, 0, 100, &x1, &y1, &w, &h);
+      return y1 < 100 ? (uint16_t)(100 - y1) : 0;
+    }
     // Call once from setup() while the built-in font is active (before any
     // setFont(customFont) call).
     static void primeBaseFontHeight()   { m_baseFontH   = measureLineHeight(); }
@@ -125,7 +142,10 @@ namespace oneIO::display {
     // setFont(f) — caller is responsible for restoring the font afterward
     // (setFont(nullptr) to go back to the built-in font before real
     // rendering starts).
-    static void primeCustomFontHeight() { m_customFontH = measureLineHeight(); }
+    static void primeCustomFontHeight() {
+      m_customFontH      = measureLineHeight();
+      m_customFontAscent = measureAscent();
+    }
 
     static void print(char c) {
       driver->setTextColor(_inv ? m_bg : m_fg);
@@ -133,7 +153,10 @@ namespace oneIO::display {
     }
     static void print(const char* s) { while (*s) print(*s++); }
 
-    static void setCursor(uint16_t x, uint16_t y) { driver->setCursor(x, y); }
+    // Baseline correction: see m_customFontAscent's comment above.
+    static void setCursor(uint16_t x, uint16_t y) {
+      driver->setCursor(x, m_customFont ? (uint16_t)(y + m_customFontAscent) : y);
+    }
     static void setBigFont(bool) {}  // no big/small font toggle — disclosed simplification
     static void clear() { driver->fillScreen(m_bg); }
     static void flush() {}  // see file header comment
@@ -175,7 +198,34 @@ namespace oneIO::display {
     static void begin(VendorT& d) { driver = &d; }
 
     static void setColors(uint16_t fg, uint16_t bg) { m_fg=fg; m_bg=bg; }
-    static void setFont(const GFXfont* f) { driver->setFont(f); }
+
+    inline static bool     m_customFont       = false;
+    inline static uint16_t m_baseFontH        = CharH;
+    inline static uint16_t m_customFontH      = CharH;
+    inline static uint16_t m_customFontAscent = 0;
+    static void setFont(const GFXfont* f) { driver->setFont(f); m_customFont = (f != nullptr); }
+
+    // Same shape as AdaGfxVendor's own lineHeight()/measureLineHeight()/
+    // measureAscent()/prime*() — see that type's comments for the full
+    // rationale (cached, not live, to avoid corrupting the driver's SPI
+    // addressing state mid-frame; ascent corrects for Adafruit_GFX's
+    // baseline-vs-top-left switch under a custom GFXfont).
+    static uint16_t lineHeight() { return m_customFont ? m_customFontH : m_baseFontH; }
+    static uint16_t measureLineHeight(const char* sample="Mg") {
+      int16_t x1, y1; uint16_t w, h;
+      driver->getTextBounds(sample, 0, 100, &x1, &y1, &w, &h);
+      return h > 0 ? h : CharH;
+    }
+    static uint16_t measureAscent(const char* sample="Mg") {
+      int16_t x1, y1; uint16_t w, h;
+      driver->getTextBounds(sample, 0, 100, &x1, &y1, &w, &h);
+      return y1 < 100 ? (uint16_t)(100 - y1) : 0;
+    }
+    static void primeBaseFontHeight()   { m_baseFontH   = measureLineHeight(); }
+    static void primeCustomFontHeight() {
+      m_customFontH      = measureLineHeight();
+      m_customFontAscent = measureAscent();
+    }
 
     static void print(char c) {
       driver->setTextColor(_inv ? m_bg : m_fg);
@@ -183,7 +233,9 @@ namespace oneIO::display {
     }
     static void print(const char* s) { while (*s) print(*s++); }
 
-    static void setCursor(uint16_t x, uint16_t y) { driver->setCursor(x, y); }
+    static void setCursor(uint16_t x, uint16_t y) {
+      driver->setCursor(x, m_customFont ? (uint16_t)(y + m_customFontAscent) : y);
+    }
     static void setBigFont(bool) {}
     static void clear() { driver->fillScreen(m_bg); }
     static void flush() { driver->display(); }
