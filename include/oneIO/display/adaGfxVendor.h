@@ -81,6 +81,52 @@ namespace oneIO::display {
     // swaps between whichever m_fg/m_bg are currently set.
     static void setColors(uint16_t fg, uint16_t bg) { m_fg=fg; m_bg=bg; }
 
+    // Real Adafruit_GFX custom font swap (GFXfont*, f=nullptr restores the
+    // built-in 5x7 font) — a raw device primitive, same shape as setColors/
+    // setInverted. Not driven by setBigFont(bool) below (which stays a no-op
+    // here): OneMenu's own FontSwitch<...> component (fmt/vendorFont.h) calls
+    // this directly, independent of the Font<bool>::Table/BigTitle mechanism.
+    // m_customFont tracks which of the two cached heights below applies —
+    // see lineHeight()'s own comment for why this is cache-based, not a live
+    // per-call query.
+    inline static bool     m_customFont  = false;
+    inline static uint16_t m_baseFontH   = CharH;
+    inline static uint16_t m_customFontH = CharH;
+    static void setFont(const GFXfont* f) { driver->setFont(f); m_customFont = (f != nullptr); }
+
+    // Real per-font line height, MEASURED ONCE (not queried live) — see
+    // measureLineHeight()/primeBaseFontHeight()/primeCustomFontHeight() below.
+    // Found on real ST7789 hardware: calling Adafruit_GFX's getTextBounds()
+    // (the only public font-metric API — gfxFont/textsize_y are protected, no
+    // getter exists) INTERLEAVED with real fillRect()/print() calls mid-frame
+    // corrupts the driver's windowed SPI addressing state, visible as a band
+    // of garbled black/white striping across the display. getTextBounds()
+    // itself isn't unsafe — calling it BETWEEN frames (never while a
+    // fillRect/print sequence is in flight) is fine, which is exactly what
+    // the prime*() functions below are for: call them once from setup(),
+    // before any real menu output starts, then this hot path never touches
+    // getTextBounds() again.
+    static uint16_t lineHeight() { return m_customFont ? m_customFontH : m_baseFontH; }
+
+    // One-time measurement helper — see lineHeight()'s comment on why this
+    // must never run interleaved with real draw calls. sample="Mg" (capital +
+    // descender) is a reasonable representative glyph for "how tall is a
+    // typical line in the currently-set font" — h is independent of the x,y
+    // anchor passed in, so the exact position given here doesn't matter.
+    static uint16_t measureLineHeight(const char* sample="Mg") {
+      int16_t x1, y1; uint16_t w, h;
+      driver->getTextBounds(sample, 0, 100, &x1, &y1, &w, &h);
+      return h > 0 ? h : CharH;
+    }
+    // Call once from setup() while the built-in font is active (before any
+    // setFont(customFont) call).
+    static void primeBaseFontHeight()   { m_baseFontH   = measureLineHeight(); }
+    // Call once from setup() with the real custom font already set via
+    // setFont(f) — caller is responsible for restoring the font afterward
+    // (setFont(nullptr) to go back to the built-in font before real
+    // rendering starts).
+    static void primeCustomFontHeight() { m_customFontH = measureLineHeight(); }
+
     static void print(char c) {
       driver->setTextColor(_inv ? m_bg : m_fg);
       driver->write((uint8_t)c);
@@ -129,6 +175,7 @@ namespace oneIO::display {
     static void begin(VendorT& d) { driver = &d; }
 
     static void setColors(uint16_t fg, uint16_t bg) { m_fg=fg; m_bg=bg; }
+    static void setFont(const GFXfont* f) { driver->setFont(f); }
 
     static void print(char c) {
       driver->setTextColor(_inv ? m_bg : m_fg);
