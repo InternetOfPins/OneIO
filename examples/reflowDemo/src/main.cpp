@@ -228,8 +228,11 @@ static void driveHeater() {
 }
 
 // ── Run modes ─────────────────────────────────────────────────────────────────
-using RunFn = bool(*)();
-RunFn activeRun;
+// ActiveRunFn, not RunFn: oneMenu::RunFn (nav.h, a function-reference alias
+// bool(&)()) is also in scope via "using namespace oneMenu;" above, and
+// collides with a same-named function-pointer alias declared here.
+using ActiveRunFn = bool(*)();
+ActiveRunFn activeRun;
 
 bool mainRun() {
   nav.in(in);

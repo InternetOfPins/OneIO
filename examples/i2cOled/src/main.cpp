@@ -17,13 +17,18 @@ using namespace oneIO::display;
 
   // WEMOS LOLIN32 OLED: on-board SSD1306 is wired to SDA=5, SCL=4.
   // Generic ESP32 devkit (external OLED): SDA=21, SCL=22 (Arduino default).
+  // Fully-qualified: bare chip:: is ambiguous here between the global
+  // ::chip namespace (platform-agnostic interrupt-source aliases, see
+  // esp32Device.h) and hw::esp32::chip (the family alias to esp32,
+  // brought into scope by "using namespace hw::esp32;" above) -- same
+  // class of collision as the documented hw::avr::chip:: ambiguity.
   #if defined(LOLIN32_OLED)
-    using Twi = chip::TwiMaster<5, 4>;
+    using Twi = hw::esp32::chip::TwiMaster<5, 4>;
   #else
-    using Twi = chip::TwiMaster<21, 22>;
+    using Twi = hw::esp32::chip::TwiMaster<21, 22>;
   #endif
 
-  using Clock = chip::SysClock;
+  using Clock = hw::esp32::chip::SysClock;
   using Board = Esp32Dev::Board<onePin::Boot<Clock>>;
 
 #else  // AVR bare-metal
