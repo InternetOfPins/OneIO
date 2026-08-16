@@ -85,7 +85,7 @@ auto mainMenu = menuDef<WrapNav>(
   )
 );
 
-NavDef<TreeNav, Root<mainMenu>> nav;
+NavDef<TreeNav<>, Root<mainMenu>> nav;
 
 // ── Run ───────────────────────────────────────────────────────────────────────
 bool running = true;
