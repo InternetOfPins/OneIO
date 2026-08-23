@@ -1,8 +1,8 @@
 /*
  * HAPI-composed Arduino_GFX adapter, hosted in OneIO -- see README.md in this
  * directory for scope and rationale (moved here from the Arduino_GFX fork's
- * own src/hapi/, which no longer exists, to avoid a real include-path collision
- * with IOP's own HAPI library -- both used to publish a top-level hapi/ folder).
+ * own src/hapi/, to avoid a real include-path collision with IOP's own
+ * HAPI library (both name a top-level hapi/ folder).
  *
  * Templated stand-in for Arduino_DataBus::batchOperation() (src/Arduino_DataBus.cpp).
  * Interprets the exact same spi_operation_type_t byte-code arrays already shipped

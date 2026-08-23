@@ -209,15 +209,14 @@ instead (a very different, no-local-framebuffer shape than "blit a whole
 prepared buffer"), so it drives the I2C protocol itself via OneIO's own
 native `Ssd1306<>` driver rather than through this class.
 
-**Verified on real hardware** (2026-07-18): `Arduino_Wire_HAPI<0x3C,0x00,0x40>`
+**Verified on real hardware**: `Arduino_Wire_HAPI<0x3C,0x00,0x40>`
 + `Arduino_SSD1306_HAPI<Bus,128,64>`, flashed to a real LOLIN32 board's
 onboard OLED (SDA=5, SCL=4 -- `Wire.begin(5,4)` before `oled.begin()`, same
-as any sketch using non-default I2C pins). `oled.begin()` returned true (a
+as any sketch using non-default I2C pins). `oled.begin()` returns true (a
 real I2C ACK from the physical SSD1306 at address 0x3C, not simulated), and
-a 16px-wide alternating-bar test pattern sent via `drawBitmap` rendered
-correctly on the physical display, confirmed visually (4 black + 4 white
-bars, matching the pattern exactly). First HAPI class in this project
-verified end-to-end on real hardware, not just compiled/linked.
+a 16px-wide alternating-bar test pattern sent via `drawBitmap` renders
+correctly on the physical display (4 black + 4 white bars, matching the
+pattern exactly).
 
 ## PDQgraphicstest: `USE_HAPI_BACKEND`
 
@@ -280,14 +279,12 @@ circles, arcs, roundrects -- `esp32dev`, `-O2`, `-DUSE_HAPI_BACKEND`):
   possible in this environment (see the periman.h note above) -- pending a
   newer Arduino-ESP32 core than any registry version currently offers.
 
-Also found and fixed along the way, in `Arduino_ST7789_HAPI`'s fast
-`writeFastHLine`/`writeFastVLine` overrides: the clipping in
-`Arduino_TFT::writeFastVLine`/`HLine` is load-bearing, not decorative --
-`writeEllipseHelper`/`fillTriangle`'s scanlines pass coordinates that run
-outside the screen, and a first draft that skipped the clipping (a plain
-1-wide/1-tall `writeFillRectPreclipped` passthrough) would have sent
-out-of-range x/y straight to `CASET`/`RASET`. Ported the original's clipping
-verbatim instead of the naive version.
+In `Arduino_ST7789_HAPI`'s fast `writeFastHLine`/`writeFastVLine` overrides,
+the clipping in `Arduino_TFT::writeFastVLine`/`HLine` is load-bearing, not
+decorative -- `writeEllipseHelper`/`fillTriangle`'s scanlines pass
+coordinates that run outside the screen; a plain 1-wide/1-tall
+`writeFillRectPreclipped` passthrough without that clipping would send
+out-of-range x/y straight to `CASET`/`RASET`.
 
 ## Reading the numbers
 

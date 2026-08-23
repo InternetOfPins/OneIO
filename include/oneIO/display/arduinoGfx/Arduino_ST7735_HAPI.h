@@ -1,8 +1,8 @@
 /*
  * HAPI-composed Arduino_GFX adapter, hosted in OneIO -- see README.md in this
  * directory for scope and rationale (moved here from the Arduino_GFX fork's
- * own src/hapi/, which no longer exists, to avoid a real include-path collision
- * with IOP's own HAPI library -- both used to publish a top-level hapi/ folder).
+ * own src/hapi/, to avoid a real include-path collision with IOP's own
+ * HAPI library (both name a top-level hapi/ folder).
  *
  * Compile-time-composed stand-in for src/display/Arduino_ST7735.{h,cpp} --
  * the second display added alongside Arduino_ST7789_HAPI, on the same

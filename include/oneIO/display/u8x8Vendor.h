@@ -22,8 +22,7 @@ namespace oneIO::display {
   // 84x48 panel is 14 cols x 6 rows). kHeight is reported as Rows*8, NOT a
   // real pixel count — oneMenu::OledDisplay<Oled>'s own StaticArea always
   // divides kHeight by 8 (the SSD1306/Ucg "page = 8px" convention it was
-  // built around, confirmed directly against oledOut.h before assuming
-  // otherwise), so this is a unit-conversion to make that division recover
+  // built around, per oledOut.h), so this is a unit-conversion to make that division recover
   // the real row count, not a real pixel dimension. Nothing else in this
   // wrapper (setCursor/fillRect/Cursor<> advancement, all driven by
   // charWidth()=1/lineSpacing()=1) ever reads kHeight, so this has no
