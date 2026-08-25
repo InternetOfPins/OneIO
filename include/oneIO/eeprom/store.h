@@ -10,7 +10,7 @@ namespace oneIO::eeprom {
   struct Crc32 {
     static constexpr uint16_t size = 4;
 
-    static uint32_t compute(const uint8_t* data, uint16_t len) {
+    [[nodiscard]] static uint32_t compute(const uint8_t* data, uint16_t len) {
       uint32_t crc = 0xFFFFFFFFu;
       while (len--) {
         crc ^= *data++;
@@ -20,7 +20,7 @@ namespace oneIO::eeprom {
       return ~crc;
     }
 
-    static bool check(const uint8_t* data, uint16_t len, const uint8_t* stored) {
+    [[nodiscard]] static bool check(const uint8_t* data, uint16_t len, const uint8_t* stored) {
       uint32_t s; memcpy(&s, stored, 4);
       return compute(data, len) == s;
     }
@@ -37,7 +37,7 @@ namespace oneIO::eeprom {
   struct Signature {
     static constexpr uint16_t size = 4;
 
-    static bool check(const uint8_t* hdr) {
+    [[nodiscard]] static bool check(const uint8_t* hdr) {
       uint16_t m = (uint16_t(hdr[0]) << 8) | hdr[1];
       return m == Magic && hdr[2] == Version;
     }
@@ -49,7 +49,7 @@ namespace oneIO::eeprom {
       hdr[3] = seq;
     }
 
-    static uint8_t seq(const uint8_t* hdr) { return hdr[3]; }
+    [[nodiscard]] static uint8_t seq(const uint8_t* hdr) { return hdr[3]; }
   };
 
   // ── BlockRecycle<ContentSize, AssignedSize, PageSize> ─────────────────────
@@ -75,9 +75,9 @@ namespace oneIO::eeprom {
     inline static uint8_t _seq     = 0;
     inline static bool    _valid   = false;
 
-    static uint8_t current()  { return _current; }
-    static uint8_t seq()      { return _seq; }
-    static bool    valid()    { return _valid; }
+    [[nodiscard]] static uint8_t current()  { return _current; }
+    [[nodiscard]] static uint8_t seq()      { return _seq; }
+    [[nodiscard]] static bool    valid()    { return _valid; }
 
     static void advance() {
       _current = (_current + 1) % blockCount;
@@ -89,7 +89,7 @@ namespace oneIO::eeprom {
     }
 
     // Sequence comparison with uint8_t wrap-around
-    static bool seqAfter(uint8_t a, uint8_t b) { return int8_t(a - b) > 0; }
+    [[nodiscard]] static bool seqAfter(uint8_t a, uint8_t b) { return int8_t(a - b) > 0; }
   };
 
   // ── EepromStore<Eeprom, Data, Sig, Crc, Recycle, BaseAddr> ───────────────
@@ -125,7 +125,7 @@ namespace oneIO::eeprom {
     static void begin() { Eeprom::begin(); _scan(); }
 
     // Returns true if a valid cell was found and data loaded
-    static bool load(Data& d) {
+    [[nodiscard]] static bool load(Data& d) {
       if (!Recycle::valid()) return false;
       uint16_t addr = BaseAddr
                     + uint16_t(Recycle::current()) * Recycle::blockSize
@@ -152,7 +152,7 @@ namespace oneIO::eeprom {
       Eeprom::write(addr + Sig::size + dataSize, crcBuf, Crc::size);
     }
 
-    static bool valid() { return Recycle::valid(); }
+    [[nodiscard]] static bool valid() { return Recycle::valid(); }
 
   private:
     static void _scan() {

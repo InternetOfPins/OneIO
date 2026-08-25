@@ -31,22 +31,22 @@ namespace oneIO::sensor {
       int16_t raw;    // signed 16-bit, 1/16 °C per LSB
       bool    ok;     // false if no device on bus
 
-      float   tempC()   const { return raw / 16.0f; }
-      int16_t tempX16() const { return raw; }
+      [[nodiscard]] float   tempC()   const { return raw / 16.0f; }
+      [[nodiscard]] int16_t tempX16() const { return raw; }
     };
 
     template<typename O>
     struct Part : O {
       static void begin() { OneWireBus::begin(); O::begin(); }
 
-      static bool trigger() {
+      [[nodiscard]] static bool trigger() {
         if (!OneWireBus::reset()) return false;
         OneWireBus::skip();
         OneWireBus::writeByte(0x44);  // Convert T
         return true;
       }
 
-      static Reading read() {
+      [[nodiscard]] static Reading read() {
         if (!OneWireBus::reset()) return { 0, false };
         OneWireBus::skip();
         OneWireBus::writeByte(0xBE);  // Read Scratchpad
@@ -56,7 +56,7 @@ namespace oneIO::sensor {
         return { int16_t(uint16_t(hi) << 8 | lo), true };
       }
 
-      static Reading sample() {
+      [[nodiscard]] static Reading sample() {
         if (!trigger()) return { 0, false };
         hw::delay_ms(750);
         return read();

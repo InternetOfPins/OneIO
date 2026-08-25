@@ -35,13 +35,13 @@ namespace oneIO::storage {
     struct Part : O {
       inline static bool _ready = false;
 
-      static bool begin() {
+      [[nodiscard]] static bool begin() {
         _ready = SD.begin(CsPin);
         O::begin();
         return _ready;
       }
 
-      static bool ready() { return _ready; }
+      [[nodiscard]] static bool ready() { return _ready; }
 
       static void read(uint32_t addr, uint8_t* buf, uint16_t len) {
         File f = SD.open(Filename, FILE_READ);
@@ -71,7 +71,7 @@ namespace oneIO::storage {
         f.close();
       }
 
-      static bool exists() { return SD.exists(Filename); }
+      [[nodiscard]] static bool exists() { return SD.exists(Filename); }
       static void remove() { SD.remove(Filename); }
     };
 

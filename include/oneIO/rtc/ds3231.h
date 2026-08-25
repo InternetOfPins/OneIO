@@ -48,7 +48,7 @@ namespace oneIO::rtc {
     public:
       static void begin() { TwiMaster::begin(); Base::begin(); }
 
-      static DateTime now() {
+      [[nodiscard]] static DateTime now() {
         uint8_t buf[7];
         readBurst(0x00, buf, 7);
         return {
@@ -76,13 +76,13 @@ namespace oneIO::rtc {
       }
 
       // Temperature in 0.25 °C steps (signed int16)
-      static int16_t tempRaw() {
+      [[nodiscard]] static int16_t tempRaw() {
         uint8_t buf[2];
         readBurst(0x11, buf, 2);
         return (int16_t(int8_t(buf[0])) << 2) | (buf[1] >> 6);
       }
 
-      static float tempC() { return tempRaw() * 0.25f; }
+      [[nodiscard]] static float tempC() { return tempRaw() * 0.25f; }
     };
   };
 

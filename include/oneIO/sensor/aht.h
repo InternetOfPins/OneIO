@@ -58,16 +58,16 @@ namespace oneIO::sensor {
       }
 
       // Trigger a measurement and block until data ready (~80ms).
-      static bool measure() {
+      [[nodiscard]] static bool measure() {
         _trigger();
         hw::delay_ms(80);
         return _read();
       }
 
       // Accessors — valid after measure() returns true
-      static int16_t  tempC10() { return _tempC10; }  // e.g. 235 = 23.5°C
-      static uint16_t rhPct10() { return _rhPct10; }  // e.g. 652 = 65.2%RH
-      static bool     valid()   { return _ok; }
+      [[nodiscard]] static int16_t  tempC10() { return _tempC10; }  // e.g. 235 = 23.5°C
+      [[nodiscard]] static uint16_t rhPct10() { return _rhPct10; }  // e.g. 652 = 65.2%RH
+      [[nodiscard]] static bool     valid()   { return _ok; }
 
     private:
       static void _reset() {

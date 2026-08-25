@@ -40,7 +40,7 @@ namespace oneIO::gpio {
         TwiMaster::end_write();
       }
 
-      static uint8_t read() {
+      [[nodiscard]] static uint8_t read() {
         TwiMaster::request_from(Addr, uint8_t(1));
         return TwiMaster::read_byte();
       }
@@ -48,8 +48,8 @@ namespace oneIO::gpio {
       static void    set   (uint8_t mask) { write(_latch |  mask); }
       static void    clr   (uint8_t mask) { write(_latch & ~mask); }
       static void    toggle(uint8_t mask) { write(_latch ^  mask); }
-      static uint8_t get   (uint8_t mask) { set(mask); return read() & mask; }
-      static uint8_t latch ()             { return _latch; }
+      [[nodiscard]] static uint8_t get   (uint8_t mask) { set(mask); return read() & mask; }
+      [[nodiscard]] static uint8_t latch ()             { return _latch; }
     };
 
     using Api = hapi::APIOf<GpioDef, PCF8574<TwiMaster, Addr>>;

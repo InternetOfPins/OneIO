@@ -32,11 +32,11 @@ namespace oneIO::sensor {
       uint8_t fault;    // bit0=OC, bit1=SCG, bit2=SCV
       bool    ok;       // false if any fault set
 
-      float tempC()   const { return tc_raw * 0.25f; }
-      float coldC()   const { return cj_raw * 0.0625f; }
-      bool  openCircuit() const { return fault & 0x01; }
-      bool  shortGnd()    const { return fault & 0x02; }
-      bool  shortVcc()    const { return fault & 0x04; }
+      [[nodiscard]] float tempC()   const { return tc_raw * 0.25f; }
+      [[nodiscard]] float coldC()   const { return cj_raw * 0.0625f; }
+      [[nodiscard]] bool  openCircuit() const { return fault & 0x01; }
+      [[nodiscard]] bool  shortGnd()    const { return fault & 0x02; }
+      [[nodiscard]] bool  shortVcc()    const { return fault & 0x04; }
     };
 
     using Api = hapi::APIOf<SensorDef, MAX31855<SpiMaster, CsPin>>;
@@ -45,7 +45,7 @@ namespace oneIO::sensor {
     struct Part : O {
       static void begin() { CsPin::begin(); CsPin::on(); SpiMaster::begin(); O::begin(); }
 
-      static Reading read() {
+      [[nodiscard]] static Reading read() {
         CsPin::off();
         // Receive 4 bytes — send 0xFF (dummy) while clocking in data
         uint8_t b0 = SpiMaster::transfer(0xFF);
