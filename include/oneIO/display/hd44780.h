@@ -7,8 +7,15 @@
   #define LCD_DELAY_US(us)  _delay_us(us)
   #define LCD_DELAY_MS(ms)  _delay_ms(ms)
 #else
+  // Busy-loop iterations per microsecond. Deliberately conservative (a
+  // volatile loop is several cycles/iteration), calibrated around ~72 MHz;
+  // a slower clock just over-delays, which the HD44780 tolerates. Override
+  // -DLCD_DELAY_ITERS_PER_US if a target needs tighter init timing.
+  #ifndef LCD_DELAY_ITERS_PER_US
+    #define LCD_DELAY_ITERS_PER_US 72
+  #endif
   static inline void _lcd_delay_us(uint32_t us) {
-    for (volatile uint32_t i = us * 72; i; --i);
+    for (volatile uint32_t i = us * LCD_DELAY_ITERS_PER_US; i; --i);
   }
   static inline void _lcd_delay_ms(uint32_t ms) {
     while (ms--) _lcd_delay_us(1000);

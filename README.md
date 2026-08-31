@@ -54,6 +54,12 @@ MyLcd::print('H');
 MyLcd::clear();
 ```
 
+Same 4-bit `Hd44780` driver over any `TwiMaster` — AVR hardware TWI or
+`OneChip`'s `hw::stm32::chip::Twi<>`. Hardware-verified on ATmega328 and
+STM32F103 (the latter at both 72 and 64 MHz — see
+[`examples/i2cLcd`](examples/i2cLcd)), and reachable from Rust over FFI
+([`HAPI/examples/rust_stm32_bridge`](https://github.com/InternetOfPins/HAPI/tree/main/examples/rust_stm32_bridge)).
+
 ### PCD8544 — Nokia 5110 LCD (SPI)
 
 ```cpp
