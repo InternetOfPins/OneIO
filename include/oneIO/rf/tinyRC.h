@@ -107,7 +107,7 @@ namespace oneIO::rf {
       }
     }
 
-    static bool     available() { return _available; }
+    [[nodiscard]] static bool available() { return _available; }
     static uint32_t read()      { _available = false; return _received; }
   };
 
